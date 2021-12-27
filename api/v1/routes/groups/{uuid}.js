@@ -1,6 +1,6 @@
 module.exports = function (debug, db) {
   const logger = debug.extend("groups");
-  const Group = db.models.Groups;
+  const Group = db.models.Group;
 
   const parameters = [
     {
@@ -44,7 +44,12 @@ module.exports = function (debug, db) {
   }
 
   async function del(req, res, next) {
+    const uuid = req.params.uuid;
     try {
+      const group = await Group.findOne({
+        where: { uuid },
+      });
+      group.destroy();
       return res.json();
     } catch (err) {
       return res.status(500).json();
