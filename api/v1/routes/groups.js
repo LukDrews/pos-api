@@ -1,6 +1,6 @@
-module.exports = function (debug, sequelize) {
+module.exports = function (debug, db) {
   const logger = debug.extend("hroups");
-  const Group = sequelize.models.Group;
+  const Group = db.models.Group;
 
   let operations = {
     POST: create,

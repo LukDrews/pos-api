@@ -1,7 +1,7 @@
-module.exports = function (debug, sequelize) {
+module.exports = function (debug, db) {
   const logger = debug.extend("users");
-  const User = sequelize.models.User;
-  const Group = sequelize.models.Group;
+  const User = db.models.User;
+  const Group = db.models.Group;
 
   let operations = {
     POST: create,

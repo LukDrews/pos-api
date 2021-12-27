@@ -4,7 +4,7 @@ const debug = require("debug")("api");
 const { initialize } = require("express-openapi");
 const v1ApiDoc = require("./api/v1/api-doc");
 
-const { sequelize } = require("./api/v1/models");
+const { sequelize, Sequelize } = require("./api/v1/models");
 
 const app = express();
 
@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: false }));
 initialize({
   app,
   apiDoc: { ...v1ApiDoc },
-  dependencies: { debug, sequelize },
+  dependencies: { debug, db: sequelize, Sequelize },
   paths: "./api/v1/routes",
 });
 
