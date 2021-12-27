@@ -38,6 +38,7 @@ module.exports = function (debug, db) {
       });
       return res.json(product);
     } catch (err) {
+      logger(err);
       return res.status(500).json();
     }
   }
@@ -50,6 +51,7 @@ module.exports = function (debug, db) {
       });
       return res.json();
     } catch (err) {
+      logger(err);
       return res.status(500).json();
     }
   }
@@ -72,7 +74,7 @@ module.exports = function (debug, db) {
               },
               barcode: {
                 type: "string",
-                pattern: "^[0-9]{13}$"
+                pattern: "^[0-9]{13}$",
               },
             },
           },

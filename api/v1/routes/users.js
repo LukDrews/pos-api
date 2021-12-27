@@ -38,6 +38,7 @@ module.exports = function (debug, db) {
       const users = await User.findAll({ include: "group" });
       return res.json(users);
     } catch (err) {
+      logger(err);
       return res.status(500).json();
     }
   }

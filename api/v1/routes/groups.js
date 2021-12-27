@@ -21,9 +21,10 @@ module.exports = function (debug, db) {
 
   async function list(req, res, next) {
     try {
-      const groups = await Group.findAll({include: 'users'});
+      const groups = await Group.findAll({ include: "users" });
       return res.json(groups);
     } catch (err) {
+      logger(err);
       return res.status(500).json();
     }
   }

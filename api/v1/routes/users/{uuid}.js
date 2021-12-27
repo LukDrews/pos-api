@@ -38,6 +38,7 @@ module.exports = function (debug, db) {
       });
       return res.json(user);
     } catch (err) {
+      logger(err);
       return res.status(500).json();
     }
   }
@@ -50,6 +51,7 @@ module.exports = function (debug, db) {
       });
       return res.json(user);
     } catch (err) {
+      logger(err);
       return res.status(500).json();
     }
   }

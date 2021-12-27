@@ -29,6 +29,7 @@ module.exports = function (debug, db, Sequelize) {
       const products = await Product.findAll();
       return res.json(products);
     } catch (err) {
+      logger(err);
       return res.status(500).json();
     }
   }
