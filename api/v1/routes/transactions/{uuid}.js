@@ -22,6 +22,7 @@ module.exports = function (debug, db) {
     try {
       const transaction = await Transaction.findOne({
         where: { uuid },
+        include: "user",
       });
       return res.json(transaction);
     } catch (err) {

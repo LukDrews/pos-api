@@ -21,8 +21,7 @@ module.exports = {
         allowNull: false,
       },
       balance: {
-        type: DataTypes.BIGINT,
-        allowNull: false,
+        type: DataTypes.VIRTUAL,
       },
       birthDate: {
         type: DataTypes.DATEONLY,

@@ -11,7 +11,6 @@ module.exports = function (debug, db) {
   async function create(req, res, next) {
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
-    const balance = req.body.balance;
     const birthDate = req.body.birthDate;
     const role = req.body.role;
     const groupName = req.body.groupName;
@@ -21,10 +20,9 @@ module.exports = function (debug, db) {
       const user = await User.create({
         firstName,
         lastName,
-        balance,
         birthDate,
         role,
-        groupId: group.id,
+        groupId: group?.id,
       });
       return res.json(user);
     } catch (err) {
@@ -61,10 +59,6 @@ module.exports = function (debug, db) {
               lastName: {
                 type: "string",
                 example: "Mustermann",
-              },
-              balance: {
-                type: "number",
-                example: 25,
               },
               birthDate: {
                 type: "string",

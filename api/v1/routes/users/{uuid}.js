@@ -35,7 +35,11 @@ module.exports = function (debug, db) {
     try {
       const user = await User.findOne({
         where: { uuid },
+        include: "transactions",
       });
+      user.balance = user.transactions
+        .map((t) => t.amount)
+        ?.reduce((total, num) => total + num); // TODO use currency framework
       return res.json(user);
     } catch (err) {
       logger(err);
@@ -75,10 +79,6 @@ module.exports = function (debug, db) {
               lastName: {
                 type: "string",
                 example: "Mustermann",
-              },
-              balance: {
-                type: "number",
-                example: 25,
               },
             },
           },

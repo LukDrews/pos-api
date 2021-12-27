@@ -1,6 +1,7 @@
 module.exports = function (debug, db) {
   const logger = debug.extend("transactions");
   const Transaction = db.models.Transaction;
+  const User = db.models.User;
 
   let operations = {
     POST: create,
@@ -10,9 +11,15 @@ module.exports = function (debug, db) {
   async function create(req, res, next) {
     const amount = req.body.amount;
     const count = req.body.count;
+    const userUuid = req.body.userUuid;
 
     try {
-      const transaction = await Transaction.create({ amount, count });
+      const user = await User.findOne({ where: { uuid: userUuid } });
+      const transaction = await Transaction.create({
+        amount,
+        count,
+        userId: user.id,
+      });
       return res.json(transaction);
     } catch (err) {
       logger(err);
@@ -22,7 +29,7 @@ module.exports = function (debug, db) {
 
   async function list(req, res, next) {
     try {
-      const transactions = await Transaction.findAll();
+      const transactions = await Transaction.findAll({ include: "user" });
       return res.json(transactions);
     } catch (err) {
       logger(err);
