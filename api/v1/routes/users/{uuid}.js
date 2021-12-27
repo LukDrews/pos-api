@@ -20,7 +20,6 @@ module.exports = function (debug, db) {
 
   async function update(req, res, next) {
     const userUuid = req.params.uuid;
-
     try {
       const user = await User.findOne({ where: { uuid: userUuid } });
       user.update(req.body);
@@ -44,8 +43,12 @@ module.exports = function (debug, db) {
   }
 
   async function del(req, res, next) {
+    const uuid = req.params.uuid;
     try {
-      return res.json();
+      const user = await User.destroy({
+        where: { uuid },
+      });
+      return res.json(user);
     } catch (err) {
       return res.status(500).json();
     }

@@ -20,7 +20,6 @@ module.exports = function (debug, db) {
 
   async function update(req, res, next) {
     const groupUuid = req.params.uuid;
-
     try {
       const group = await Group.findOne({ where: { uuid: groupUuid } });
       group.update(req.body);
@@ -46,10 +45,9 @@ module.exports = function (debug, db) {
   async function del(req, res, next) {
     const uuid = req.params.uuid;
     try {
-      const group = await Group.findOne({
+      await Group.destroy({
         where: { uuid },
       });
-      group.destroy();
       return res.json();
     } catch (err) {
       return res.status(500).json();
