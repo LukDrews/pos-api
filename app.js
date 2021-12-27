@@ -17,7 +17,7 @@ initialize({
   app,
   apiDoc: { ...v1ApiDoc },
   dependencies: { debug, sequelize },
-  paths: "./api/v1/paths",
+  paths: "./api/v1/routes",
 });
 
 module.exports = app;
