@@ -14,8 +14,9 @@ module.exports = function (debug, db) {
     const balance = req.body.balance;
     const birthDate = req.body.birthDate;
     const role = req.body.role;
+    const groupName = req.body.groupName;
 
-    const group = await Group.findOne({ where: { name: "Group 1" } });
+    const group = await Group.findOne({ where: { name: groupName } });
     try {
       const user = await User.create({
         firstName,
@@ -73,6 +74,10 @@ module.exports = function (debug, db) {
                 type: "string",
                 enum: ["admin", "staff", "customer"],
                 example: "customer",
+              },
+              groupName: {
+                type: "string",
+                example: "Group 1",
               },
             },
             required: ["firstName", "lastName", "birthDate", "role"],
