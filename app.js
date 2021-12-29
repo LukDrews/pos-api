@@ -1,6 +1,7 @@
 const express = require("express");
 const logger = require("morgan");
 const { initialize } = require("express-openapi");
+const Dinero = require("dinero.js");
 const v1ApiDoc = require("./api/v1/api-doc");
 const debug = require("debug")("api");
 const errDebug = debug.extend("error");
@@ -17,7 +18,7 @@ app.use(express.urlencoded({ extended: false }));
 initialize({
   app,
   apiDoc: { ...v1ApiDoc },
-  dependencies: { debug, db: sequelize, Sequelize },
+  dependencies: { debug, db: sequelize, Sequelize, Dinero },
   paths: "./api/v1/routes",
   errorMiddleware: function (err, req, res, next) {
     errDebug(err);

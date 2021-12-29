@@ -9,9 +9,10 @@
   "dependencies": {
     "axios": "^0.24.0",
     "debug": "~4.3.3",
-    "morgan": "~1.9.1",
+    "dinero.js": "^1.9.1",
     "express": "~4.16.1",
     "express-openapi": "^10.0.0",
+    "morgan": "~1.9.1",
     "sequelize": "^6.12.2",
     "sqlite3": "^5.0.2"
   },
