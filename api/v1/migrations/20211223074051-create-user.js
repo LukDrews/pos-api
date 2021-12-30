@@ -20,9 +20,6 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      balance: {
-        type: DataTypes.VIRTUAL,
-      },
       birthDate: {
         type: DataTypes.DATEONLY,
         allowNull: false,
