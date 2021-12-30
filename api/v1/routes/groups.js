@@ -1,5 +1,5 @@
 module.exports = function (debug, db) {
-  const logger = debug.extend("hroups");
+  const logger = debug.extend("groups");
   const Group = db.models.Group;
 
   let operations = {

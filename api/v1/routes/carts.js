@@ -1,6 +1,6 @@
 module.exports = function (debug, db) {
-  const logger = debug.extend("transactions");
-  const Transaction = db.models.Transaction;
+  const logger = debug.extend("carts");
+  const Cart = db.models.Cart;
   const User = db.models.User;
 
   let operations = {
@@ -9,18 +9,11 @@ module.exports = function (debug, db) {
   };
 
   async function create(req, res, next) {
-    const amount = req.body.amount;
-    const count = req.body.count;
     const userUuid = req.body.userUuid;
-
     try {
       const user = await User.findOne({ where: { uuid: userUuid } });
-      const transaction = await Transaction.create({
-        amount,
-        count,
-        userId: user.id,
-      });
-      return res.json(transaction);
+      const cart = await Cart.create({ userId: user.id });
+      return res.json(cart);
     } catch (err) {
       logger(err);
       return res.status(500).json();
@@ -29,8 +22,8 @@ module.exports = function (debug, db) {
 
   async function list(req, res, next) {
     try {
-      const transactions = await Transaction.findAll({ include: "user" });
-      return res.json(transactions);
+      const carts = await Cart.findAll({include: "user"});
+      return res.json(carts);
     } catch (err) {
       logger(err);
       return res.status(500).json();
@@ -38,9 +31,9 @@ module.exports = function (debug, db) {
   }
 
   create.apiDoc = {
-    summary: "Create transaction",
-    description: "Create a new transaction",
-    operationId: "post-transactions",
+    summary: "Create cart",
+    description: "Create a new cart",
+    operationId: "post-carts",
     tags: [],
     requestBody: {
       content: {
@@ -50,31 +43,15 @@ module.exports = function (debug, db) {
             properties: {
               userUuid: {
                 type: "string",
-                pattern:
-                  "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[a-f0-9]{4}-[a-f0-9]{12}$",
-              },
-              productUuid: {
-                type: "string",
-                pattern:
-                  "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[a-f0-9]{4}-[a-f0-9]{12}$",
-              },
-              amount: {
-                type: "integer",
-                example: 100,
-              },
-              count: {
-                type: "integer",
-                example: 2,
               },
             },
-            required: ["amount"],
           },
         },
       },
     },
     responses: {
       200: {
-        description: "A transaction was created",
+        description: "A cart was created",
         content: {
           "application/json": {
             schema: {},
@@ -88,13 +65,13 @@ module.exports = function (debug, db) {
   };
 
   list.apiDoc = {
-    summary: "Get all transactions",
-    description: "Get all transactions",
-    operationId: "get-users",
+    summary: "Get all carts",
+    description: "Get all carts",
+    operationId: "get-carts",
     tags: [],
     responses: {
       200: {
-        description: "A list of all transaction",
+        description: "A list of all carts",
         content: {
           "application/json": {
             schema: {},
