@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * //FIXME this model could be deleted.
+ * The cart is only attached to the user and the user could be the cart itself.
+ * No need for an extra table.
+ */
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Cart extends Model {

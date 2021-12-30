@@ -7,10 +7,11 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Group, Cart }) {
+    static associate({ Group, Cart, Order }) {
       // define association here
       this.belongsTo(Group, { foreignKey: "groupId", as: "group" });
       this.hasOne(Cart, { foreignKey: "userId", as: "cart" });
+      this.hasMany(Order, { foreignKey: "userId", as: "orders" });
     }
 
     toJSON() {
