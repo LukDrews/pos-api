@@ -20,6 +20,15 @@ module.exports = {
         allowNull: false,
         type: DataTypes.INTEGER,
       },
+      count: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+      },
+      amount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

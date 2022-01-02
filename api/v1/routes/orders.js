@@ -1,8 +1,9 @@
-module.exports = function (debug, db) {
+module.exports = function (debug, db, Dinero) {
   const logger = debug.extend("orders");
   const Order = db.models.Order;
   const OrderItem = db.models.OrderItem;
   const User = db.models.User;
+  const CartItem = db.models.CartItem;
 
   let operations = {
     POST: create,
@@ -13,8 +14,31 @@ module.exports = function (debug, db) {
     const userUuid = req.body.userUuid;
 
     try {
+      const cartItems = await CartItem.findAll({ include: "product" });
       const user = await User.findOne({ where: { uuid: userUuid } });
       const order = await Order.create({ userId: user.id });
+
+      // create OrderItems
+      let totalAmount = 0;
+      const items = [];
+      for (const cartItem of cartItems) {
+        const product = cartItem.product;
+        const amount = Dinero({ amount: product.price })
+          .multiply(cartItem.count)
+          .getAmount();
+        totalAmount += amount;
+
+        items.push({
+          orderId: order.id,
+          productId: product.id,
+          count: cartItem.count,
+          amount: amount,
+        });
+      }
+      await OrderItem.bulkCreate(items);
+      await order.update({ amount: totalAmount });
+
+      await CartItem.destroy({ truncate: true });
       return res.json(order);
     } catch (err) {
       logger(err);

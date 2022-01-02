@@ -61,7 +61,7 @@ module.exports = function (debug, db) {
           schema: {
             type: "object",
             properties: {
-              userUuid: {
+              productUuid: {
                 type: "string",
               },
             },

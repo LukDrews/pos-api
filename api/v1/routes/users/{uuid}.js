@@ -22,7 +22,7 @@ module.exports = function (debug, db) {
     const userUuid = req.params.uuid;
     try {
       const user = await User.findOne({ where: { uuid: userUuid } });
-      user.update(req.body);
+      await user.update(req.body);
       return res.json(user);
     } catch (err) {
       logger(err);
@@ -35,7 +35,7 @@ module.exports = function (debug, db) {
     try {
       const user = await User.findOne({
         where: { uuid },
-        include: { all: true, nested: true }
+        include: ["group", "orders"],
       });
       return res.json(user);
     } catch (err) {

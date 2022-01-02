@@ -19,7 +19,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
-      price: {
+      count: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+      },
+      amount: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },

@@ -19,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
+      amount: {
+        type: DataTypes.INTEGER
+      },
     },
     {
       sequelize,
