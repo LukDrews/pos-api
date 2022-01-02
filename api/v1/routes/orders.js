@@ -14,7 +14,6 @@ module.exports = function (debug, db) {
 
     try {
       const user = await User.findOne({ where: { uuid: userUuid } });
-      const oderdItems = await 
       const order = await Order.create({ userId: user.id });
       return res.json(order);
     } catch (err) {
@@ -44,8 +43,8 @@ module.exports = function (debug, db) {
           schema: {
             type: "object",
             properties: {
-              name: {
-                type: "userUuid",
+              userUuid: {
+                type: "string",
               },
             },
             required: ["userUuid"],

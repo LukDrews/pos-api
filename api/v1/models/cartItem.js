@@ -1,47 +1,37 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Product extends Model {
+  class CartItem extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ OrderItem }) {
+    static associate({ Product }) {
       // define association here
-      // this.hasMany(CartItem, { foreignKey: "productId", as: ""})
-      this.hasMany(OrderItem, { foreignKey: "productId", as: "orders" });
+      this.belongsTo(Product, { foreignKey: "productId", as: "product" });
     }
-
     toJSON() {
-      return { ...this.get(), id: undefined };
+      return { ...this.get(), id: undefined, productId: undefined };
     }
   }
-  Product.init(
+  CartItem.init(
     {
       uuid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      price: {
+      count: {
         type: DataTypes.INTEGER,
         allowNull: false,
-      },
-      barcode: {
-        type: DataTypes.STRING,
-        unique: true,
+        defaultValue: 1,
       },
     },
     {
       sequelize,
-      tableName: "products",
-      modelName: "Product",
+      tableName: "cartItems",
+      modelName: "CartItem",
     }
   );
-  return Product;
+  return CartItem;
 };
