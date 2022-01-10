@@ -1,3 +1,4 @@
+const { ValidationError } = require("../utils/errors");
 module.exports = function (debug, db) {
   const logger = debug.extend("users");
   const User = db.models.User;
@@ -16,6 +17,17 @@ module.exports = function (debug, db) {
     const groupName = req.body.groupName;
 
     const group = await Group.findOne({ where: { name: groupName } });
+    if (groupName && group === null) {
+      const openapiErr = new ValidationError(
+        404,
+        "body",
+        `group '${groupName}' not found`,
+        "groupName"
+      );
+      next(openapiErr);
+      return;
+    }
+
     try {
       const user = await User.create({
         firstName,
