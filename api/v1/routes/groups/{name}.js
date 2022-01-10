@@ -4,11 +4,11 @@ module.exports = function (debug, db) {
 
   const parameters = [
     {
-      name: "uuid",
+      name: "name",
       in: "path",
       type: "string",
       required: true,
-      description: "UUID of a Group",
+      description: "name of a group",
     },
   ];
 
@@ -19,10 +19,11 @@ module.exports = function (debug, db) {
   };
 
   async function update(req, res, next) {
-    const groupUuid = req.params.uuid;
+    const name = req.params.name;
+    const newName = req.body.name;
     try {
-      const group = await Group.findOne({ where: { uuid: groupUuid } });
-      group.update(req.body);
+      const group = await Group.findOne({ where: { name } });
+      group.update({ name: newName});
       return res.json(group);
     } catch (err) {
       logger(err);
@@ -31,10 +32,10 @@ module.exports = function (debug, db) {
   }
 
   async function read(req, res, next) {
-    const uuid = req.params.uuid;
+    const name = req.params.name;
     try {
       const group = await Group.findOne({
-        where: { uuid },
+        where: { name },
       });
       return res.json(group);
     } catch (err) {
@@ -44,10 +45,10 @@ module.exports = function (debug, db) {
   }
 
   async function del(req, res, next) {
-    const uuid = req.params.uuid;
+    const name = req.params.name;
     try {
       await Group.destroy({
-        where: { uuid },
+        where: { uuid: name },
       });
       return res.json();
     } catch (err) {
