@@ -35,7 +35,7 @@ module.exports = function (debug, db) {
     try {
       const user = await User.findOne({
         where: { uuid },
-        include: ["group", "orders"],
+        include: ["role", "group", "orders"],
       });
       return res.json(user);
     } catch (err) {

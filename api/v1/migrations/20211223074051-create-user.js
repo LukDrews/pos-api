@@ -24,14 +24,13 @@ module.exports = {
         type: DataTypes.DATEONLY,
         allowNull: false,
       },
-      role: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: "customer",
-      },
       groupId: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
+      },
+      roleId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

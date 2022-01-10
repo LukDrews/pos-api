@@ -1,2 +1,2 @@
-exports.BaseError = require('./baseError');
-exports.ValidationError = require('./validationError');
+exports.BaseError = require("./baseError");
+exports.ValidationError = require("./validationError");

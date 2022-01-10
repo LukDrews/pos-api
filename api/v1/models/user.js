@@ -7,14 +7,20 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Group, Cart, Order }) {
+    static associate({ Group, Order, Role }) {
       // define association here
       this.belongsTo(Group, { foreignKey: "groupId", as: "group" });
       this.hasMany(Order, { foreignKey: "userId", as: "orders" });
+      this.belongsTo(Role, { foreignKey: "roleId", as: "role" });
     }
 
     toJSON() {
-      return { ...this.get(), id: undefined, groupId: undefined };
+      return {
+        ...this.get(),
+        id: undefined,
+        groupId: undefined,
+        roleId: undefined,
+      };
     }
   }
   User.init(
@@ -34,11 +40,6 @@ module.exports = (sequelize, DataTypes) => {
       birthDate: {
         type: DataTypes.DATEONLY,
         allowNull: false,
-      },
-      role: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: "customer",
       },
     },
     {

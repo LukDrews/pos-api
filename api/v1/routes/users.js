@@ -2,6 +2,7 @@ const { ValidationError } = require("../utils/errors");
 module.exports = function (debug, db) {
   const logger = debug.extend("users");
   const User = db.models.User;
+  const Role = db.models.Role;
   const Group = db.models.Group;
 
   let operations = {
@@ -14,17 +15,29 @@ module.exports = function (debug, db) {
     const lastName = req.body.lastName;
     const birthDate = req.body.birthDate;
     const role = req.body.role;
-    const groupName = req.body.groupName;
+    const group = req.body.group;
 
-    const group = await Group.findOne({ where: { name: groupName } });
-    if (groupName && group === null) {
-      const openapiErr = new ValidationError(
+    const roleDB = await Role.findOne({ where: { name: role } });
+    if (role && roleDB === null) {
+      const roleErr = new ValidationError(
         404,
         "body",
-        `group '${groupName}' not found`,
-        "groupName"
+        `role ${role} not found`,
+        "role"
       );
-      next(openapiErr);
+      nect(roleErr);
+      return;
+    }
+
+    const groupDB = await Group.findOne({ where: { name: group } });
+    if (group && groupDB === null) {
+      const groupErr = new ValidationError(
+        404,
+        "body",
+        `group '${group}' not found`,
+        "group"
+      );
+      next(groupErr);
       return;
     }
 
@@ -33,8 +46,8 @@ module.exports = function (debug, db) {
         firstName,
         lastName,
         birthDate,
-        role,
-        groupId: group?.id,
+        roleId: roleDB.id,
+        groupId: groupDB.id,
       });
       return res.json(user);
     } catch (err) {
@@ -79,10 +92,9 @@ module.exports = function (debug, db) {
               },
               role: {
                 type: "string",
-                enum: ["admin", "staff", "customer"],
                 example: "customer",
               },
-              groupName: {
+              group: {
                 type: "string",
                 example: "Group 1",
               },
