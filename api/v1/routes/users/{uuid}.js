@@ -1,6 +1,8 @@
 module.exports = function (debug, db) {
   const logger = debug.extend("users");
   const User = db.models.User;
+  const Role = db.models.Role;
+  const Group = db.models.Group;
 
   const parameters = [
     {
@@ -20,9 +22,24 @@ module.exports = function (debug, db) {
 
   async function update(req, res, next) {
     const userUuid = req.params.uuid;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const birthDate = req.body.birthDate;
+    const role = req.body.role;
+    const group = req.body.group;
+
     try {
+      // TODO add error handling for
+      const roleDB = await Role.findOne({ where: { name: role } });
+      const groupDB = await Group.findOne({ where: { name: group } });
       const user = await User.findOne({ where: { uuid: userUuid } });
-      await user.update(req.body);
+      await user.update({
+        firstName,
+        lastName,
+        birthDate,
+        roleId: roleDB.id,
+        groupId: groupDB.id,
+      });
       return res.json(user);
     } catch (err) {
       logger(err);
@@ -66,7 +83,6 @@ module.exports = function (debug, db) {
       content: {
         "application/json": {
           schema: {
-            // TODO use component schema -> same for post/create
             type: "object",
             properties: {
               firstName: {
@@ -76,6 +92,19 @@ module.exports = function (debug, db) {
               lastName: {
                 type: "string",
                 example: "Mustermann",
+              },
+              birthDate: {
+                type: "string",
+                format: "date",
+                example: "2017-07-21",
+              },
+              role: {
+                type: "string",
+                example: "customer",
+              },
+              group: {
+                type: "string",
+                example: "Group 1",
               },
             },
           },

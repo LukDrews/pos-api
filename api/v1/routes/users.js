@@ -25,7 +25,7 @@ module.exports = function (debug, db) {
         `role ${role} not found`,
         "role"
       );
-      nect(roleErr);
+      next(roleErr);
       return;
     }
 
@@ -58,7 +58,7 @@ module.exports = function (debug, db) {
 
   async function list(req, res, next) {
     try {
-      const users = await User.findAll({ include: "group" });
+      const users = await User.findAll({ include: ["group", "role"] });
       return res.json(users);
     } catch (err) {
       logger(err);
@@ -99,7 +99,7 @@ module.exports = function (debug, db) {
                 example: "Group 1",
               },
             },
-            required: ["firstName", "lastName", "birthDate", "role"],
+            required: ["firstName", "lastName", "birthDate", "group", "role"],
           },
         },
       },
