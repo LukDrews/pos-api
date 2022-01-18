@@ -1,5 +1,5 @@
 const { ValidationError } = require("../utils/errors");
-module.exports = function (debug, db) {
+module.exports = function (debug, db, sharp) {
   const logger = debug.extend("users");
   const User = db.models.User;
   const Role = db.models.Role;
@@ -16,6 +16,7 @@ module.exports = function (debug, db) {
     const birthDate = req.body.birthDate;
     const role = req.body.role;
     const group = req.body.group;
+    const image = req.files[0];
 
     const roleDB = await Role.findOne({ where: { name: role } });
     if (role && roleDB === null) {
@@ -42,12 +43,24 @@ module.exports = function (debug, db) {
     }
 
     try {
+      let link = null;
+      if (image) {
+        const { buffer, originalname } = image;
+        const timestamp = new Date().toISOString();
+        const ref = `${timestamp}-${originalname}.webp`;
+        await sharp(buffer)
+          .webp({ quality: 20 })
+          .toFile("./uploads/" + ref);
+        link = `http://localhost:3000/${ref}`;
+      }
+
       const user = await User.create({
         firstName,
         lastName,
         birthDate,
         roleId: roleDB.id,
         groupId: groupDB.id,
+        imageLink: link,
       });
       return res.json(user);
     } catch (err) {
@@ -72,10 +85,12 @@ module.exports = function (debug, db) {
     operationId: "post-users",
     tags: [],
     requestBody: {
+      required: true,
       content: {
-        "application/json": {
+        "multipart/form-data": {
           schema: {
             type: "object",
+            required: ["firstName", "lastName", "birthDate", "group", "role"],
             properties: {
               firstName: {
                 type: "string",
@@ -98,8 +113,11 @@ module.exports = function (debug, db) {
                 type: "string",
                 example: "Group 1",
               },
+              image: {
+                type: "string",
+                format: "binary",
+              },
             },
-            required: ["firstName", "lastName", "birthDate", "group", "role"],
           },
         },
       },

@@ -24,6 +24,10 @@ module.exports = {
         type: DataTypes.DATEONLY,
         allowNull: false,
       },
+      imageLink: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       groupId: {
         type: DataTypes.INTEGER,
         allowNull: false,
