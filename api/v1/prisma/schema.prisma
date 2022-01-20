@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./db/development_migrate.sqlite"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  uuid      String   @default(uuid())
+  firstName String
+  lastName  String
+  birthDate DateTime
+  role      Role     @relation(fields: [roleId], references: [id])
+  roleId    Int
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   Int
+  orders    Order[]
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+model Group {
+  id        Int      @id @default(autoincrement())
+  uuid      String   @default(uuid())
+  name      String
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  users User[]
+}
+
+model Product {
+  id         Int         @id @default(autoincrement())
+  uuid       String      @unique() @default(uuid())
+  name       String      @unique()
+  price      Int
+  barcode    String?     @unique()
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  cartItems  CartItem[]  @ignore
+  orderItems OrderItem[] @ignore
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  uuid      String      @default(uuid())
+  user      User        @relation(fields: [userId], references: [id])
+  userId    Int
+  amount    Int?
+  items     OrderItem[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  uuid      String   @default(uuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   Int
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  count     Int      @default(1)
+  amount    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  uuid      String   @default(uuid())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int      @unique()
+  count     Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

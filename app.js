@@ -6,6 +6,8 @@ const cors = require("cors");
 const fs = require("fs");
 const { initialize } = require("express-openapi");
 const Dinero = require("dinero.js");
+const { PrismaClient } = require("@prisma/client");
+
 const v1ApiDoc = require("./api/v1/api-doc");
 const debug = require("debug")("api");
 const errDebug = debug.extend("error");
@@ -33,7 +35,7 @@ fs.access("./uploads", (error) => {
 initialize({
   app,
   apiDoc: { ...v1ApiDoc },
-  dependencies: { debug, db: sequelize, Sequelize, Dinero, sharp },
+  dependencies: { debug, db: sequelize, prismaDB: new PrismaClient(), Dinero, sharp },
   paths: "./api/v1/routes",
   consumesMiddleware: {
     "application/json": express.json(),
