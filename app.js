@@ -12,7 +12,6 @@ const v1ApiDoc = require("./api/v1/api-doc");
 const debug = require("debug")("api");
 const errDebug = debug.extend("error");
 
-const { sequelize, Sequelize } = require("./api/v1/models");
 
 const app = express();
 const storage = multer.memoryStorage();
@@ -34,7 +33,7 @@ fs.access("./uploads", (error) => {
 initialize({
   app,
   apiDoc: { ...v1ApiDoc },
-  dependencies: { debug, db: sequelize, prismaDB: new PrismaClient(), Prisma, Dinero, sharp },
+  dependencies: { debug, prismaDB: new PrismaClient(), Prisma, Dinero, sharp },
   paths: "./api/v1/routes",
   consumesMiddleware: {
     "application/json": express.json(),
