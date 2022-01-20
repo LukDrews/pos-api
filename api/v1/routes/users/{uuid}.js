@@ -1,8 +1,8 @@
-module.exports = function (debug, db) {
+module.exports = function (debug, prismaDB) {
   const logger = debug.extend("users");
-  const User = db.models.User;
-  const Role = db.models.Role;
-  const Group = db.models.Group;
+  const User = prismaDB.user;
+  const Role = prismaDB.role;
+  const Group = prismaDB.group;
 
   const parameters = [
     {
@@ -24,21 +24,24 @@ module.exports = function (debug, db) {
     const userUuid = req.params.uuid;
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
-    const birthDate = req.body.birthDate;
+    const birthDate = new Date(req.body.birthDate).toISOString();
     const role = req.body.role;
     const group = req.body.group;
 
     try {
       // TODO add error handling for
-      const roleDB = await Role.findOne({ where: { name: role } });
-      const groupDB = await Group.findOne({ where: { name: group } });
-      const user = await User.findOne({ where: { uuid: userUuid } });
-      await user.update({
-        firstName,
-        lastName,
-        birthDate,
-        roleId: roleDB.id,
-        groupId: groupDB.id,
+      const roleDB = await Role.findUnique({ where: { name: role } });
+      const groupDB = await Group.findUnique({ where: { name: group } });
+      const user = await User.update({
+        where: { uuid: userUuid },
+        data: {
+          firstName,
+          lastName,
+          birthDate,
+          roleId: roleDB.id,
+          groupId: groupDB.id,
+        },
+        include: { role: true, group: true, orders: true },
       });
       return res.json(user);
     } catch (err) {
@@ -50,9 +53,9 @@ module.exports = function (debug, db) {
   async function read(req, res, next) {
     const uuid = req.params.uuid;
     try {
-      const user = await User.findOne({
+      const user = await User.findUnique({
         where: { uuid },
-        include: ["role", "group", "orders"],
+        include: { role: true, group: true, orders: true },
       });
       return res.json(user);
     } catch (err) {
@@ -64,7 +67,7 @@ module.exports = function (debug, db) {
   async function del(req, res, next) {
     const uuid = req.params.uuid;
     try {
-      const user = await User.destroy({
+      const user = await User.delete({
         where: { uuid },
       });
       return res.json(user);

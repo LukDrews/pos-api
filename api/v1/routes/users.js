@@ -1,9 +1,9 @@
 const { ValidationError } = require("../utils/errors");
-module.exports = function (debug, db, sharp) {
+module.exports = function (debug, prismaDB, sharp) {
   const logger = debug.extend("users");
-  const User = db.models.User;
-  const Role = db.models.Role;
-  const Group = db.models.Group;
+  const User = prismaDB.user;
+  const Role = prismaDB.role;
+  const Group = prismaDB.group;
 
   let operations = {
     POST: create,
@@ -13,34 +13,14 @@ module.exports = function (debug, db, sharp) {
   async function create(req, res, next) {
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
-    const birthDate = req.body.birthDate;
+    const birthDate = new Date(req.body.birthDate).toISOString();
     const role = req.body.role;
     const group = req.body.group;
     const image = req.files[0];
 
-    const roleDB = await Role.findOne({ where: { name: role } });
-    if (role && roleDB === null) {
-      const roleErr = new ValidationError(
-        404,
-        "body",
-        `role ${role} not found`,
-        "role"
-      );
-      next(roleErr);
-      return;
-    }
+    const roleDB = await Role.findUnique({ where: { name: role } });
 
-    const groupDB = await Group.findOne({ where: { name: group } });
-    if (group && groupDB === null) {
-      const groupErr = new ValidationError(
-        404,
-        "body",
-        `group '${group}' not found`,
-        "group"
-      );
-      next(groupErr);
-      return;
-    }
+    const groupDB = await Group.findUnique({ where: { name: group } });
 
     try {
       let link = null;
@@ -55,12 +35,26 @@ module.exports = function (debug, db, sharp) {
       }
 
       const user = await User.create({
-        firstName,
-        lastName,
-        birthDate,
-        roleId: roleDB.id,
-        groupId: groupDB.id,
-        imageLink: link,
+        data: {
+          firstName,
+          lastName,
+          birthDate,
+          role: {
+            connect: {
+              id: roleDB.id,
+            },
+          },
+          group: {
+            connect: {
+              id: groupDB.id,
+            },
+          },
+          imageLink: link,
+        },
+        include: {
+          role: true,
+          group: true,
+        },
       });
       return res.json(user);
     } catch (err) {
@@ -71,7 +65,9 @@ module.exports = function (debug, db, sharp) {
 
   async function list(req, res, next) {
     try {
-      const users = await User.findAll({ include: ["group", "role"] });
+      const users = await User.findMany({
+        include: { group: true, role: true },
+      });
       return res.json(users);
     } catch (err) {
       logger(err);
