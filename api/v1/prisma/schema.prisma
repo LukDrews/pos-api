@@ -44,8 +44,8 @@ model Product {
   barcode    String?     @unique()
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
-  cartItems  CartItem[]  @ignore
-  orderItems OrderItem[] @ignore
+  cartItems  CartItem[]  
+  orderItems OrderItem[]
 }
 
 model Order {
@@ -74,7 +74,7 @@ model OrderItem {
 
 model CartItem {
   id        Int      @id @default(autoincrement())
-  uuid      String   @default(uuid())
+  uuid      String   @unique() @default(uuid())
   product   Product  @relation(fields: [productId], references: [id])
   productId Int      @unique()
   count     Int      @default(1)

@@ -6,7 +6,7 @@ const cors = require("cors");
 const fs = require("fs");
 const { initialize } = require("express-openapi");
 const Dinero = require("dinero.js");
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient, Prisma } = require("@prisma/client");
 
 const v1ApiDoc = require("./api/v1/api-doc");
 const debug = require("debug")("api");
@@ -30,12 +30,11 @@ fs.access("./uploads", (error) => {
     fs.mkdirSync("./uploads");
   }
 });
-
 // create openapi-config
 initialize({
   app,
   apiDoc: { ...v1ApiDoc },
-  dependencies: { debug, db: sequelize, prismaDB: new PrismaClient(), Dinero, sharp },
+  dependencies: { debug, db: sequelize, prismaDB: new PrismaClient(), Prisma, Dinero, sharp },
   paths: "./api/v1/routes",
   consumesMiddleware: {
     "application/json": express.json(),

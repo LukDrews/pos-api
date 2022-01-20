@@ -1,7 +1,7 @@
-module.exports = function (debug, db) {
+module.exports = function (debug, prismaDB, Prisma) {
   const logger = debug.extend("carts");
-  const CartItem = db.models.CartItem;
-  const Product = db.models.Product;
+  const CartItem = prismaDB.cartItem;
+  const Product = prismaDB.product;
 
   let operations = {
     POST: add,
@@ -12,17 +12,21 @@ module.exports = function (debug, db) {
   async function add(req, res, next) {
     const productUuid = req.body.productUuid;
     try {
-      const product = await Product.findOne({ where: { uuid: productUuid } });
-      // if item in cart, increment count, else add item to cart
-      let cartItem = await CartItem.findOne({
-        where: { productId: product.id },
+      const product = await Product.findUnique({
+        where: { uuid: productUuid },
       });
-      if (cartItem) {
-        cartItem.count++;
-        cartItem.save()
-      } else {
-        cartItem = await CartItem.create({ productId: product.id });
-      }
+      // if item in cart, increment count, else add item to cart
+      let cartItem = await CartItem.upsert({
+        where: { productId: product.id },
+        update: {
+          count: {
+            increment: 1,
+          },
+        },
+        create: {
+          productId: product.id,
+        },
+      });
       return res.json(cartItem);
     } catch (err) {
       logger(err);
@@ -32,8 +36,11 @@ module.exports = function (debug, db) {
 
   async function list(req, res, next) {
     try {
-      const items = await CartItem.findAll({ include: "product" });
-      logger(items);
+      const items = await CartItem.findMany({
+        include: {
+          product: true,
+        },
+      });
       return res.json(items);
     } catch (err) {
       logger(err);
@@ -42,12 +49,39 @@ module.exports = function (debug, db) {
   }
 
   async function remove(req, res, next) {
-    const cartItemUuid = req.body.uuid;
+    const productUuid = req.body.productUuid;
     try {
-      await CartItem.destroy({
-        where: { uuid: cartItemUuid },
+      const product = await Product.findUnique({
+        where: { uuid: productUuid },
       });
-    } catch (error) {}
+
+      const cartItem = await CartItem.update({
+        where: { productId: product.id },
+        data: {
+          count: {
+            decrement: 1,
+          },
+        },
+      });
+
+      if (cartItem.count === 0) {
+        await CartItem.delete({
+          where: { productId: product.id },
+        });
+        return res.json();
+      } else {
+        return res.json(cartItem);
+      }
+    } catch (err) {
+      logger(err);
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        // P2025: An operation failed because it depends on one or more records that were required but not found.
+        if (err.code === "P2025") {
+          res.status(404).json();
+        }
+      }
+      return res.status(500).json();
+    }
   }
 
   add.apiDoc = {
@@ -109,6 +143,20 @@ module.exports = function (debug, db) {
     description: "Remove item from the cart",
     operationId: "delete-cart",
     tags: [],
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              productUuid: {
+                type: "string",
+              },
+            },
+          },
+        },
+      },
+    },
     responses: {
       200: {
         description: "An item was removed from the cart",
