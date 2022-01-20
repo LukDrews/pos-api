@@ -1,6 +1,6 @@
-module.exports = function (debug, db) {
+module.exports = function (debug, prismaDB) {
   const logger = debug.extend("groups");
-  const Group = db.models.Group;
+  const Group = prismaDB.group;
 
   const parameters = [
     {
@@ -22,8 +22,10 @@ module.exports = function (debug, db) {
     const name = req.params.name;
     const newName = req.body.name;
     try {
-      const group = await Group.findOne({ where: { name } });
-      group.update({ name: newName});
+      const group = await Group.update({
+        where: { name },
+        data: { name: newName },
+      });
       return res.json(group);
     } catch (err) {
       logger(err);
@@ -34,8 +36,11 @@ module.exports = function (debug, db) {
   async function read(req, res, next) {
     const name = req.params.name;
     try {
-      const group = await Group.findOne({
+      const group = await Group.findUnique({
         where: { name },
+        include: {
+          users: true,
+        },
       });
       return res.json(group);
     } catch (err) {
@@ -47,8 +52,8 @@ module.exports = function (debug, db) {
   async function del(req, res, next) {
     const name = req.params.name;
     try {
-      await Group.destroy({
-        where: { uuid: name },
+      await Group.delete({
+        where: { name },
       });
       return res.json();
     } catch (err) {

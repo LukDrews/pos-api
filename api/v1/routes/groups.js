@@ -1,6 +1,6 @@
-module.exports = function (debug, db) {
+module.exports = function (debug, prismaDB) {
   const logger = debug.extend("groups");
-  const Group = db.models.Group;
+  const Group = prismaDB.group;
 
   let operations = {
     POST: create,
@@ -11,7 +11,7 @@ module.exports = function (debug, db) {
     const name = req.body.name;
 
     try {
-      const group = await Group.create({ name });
+      const group = await Group.create({ data: { name } });
       return res.json(group);
     } catch (err) {
       logger(err);
@@ -21,7 +21,7 @@ module.exports = function (debug, db) {
 
   async function list(req, res, next) {
     try {
-      const groups = await Group.findAll({ include: "users" });
+      const groups = await Group.findMany({ include: { users: true } });
       return res.json(groups);
     } catch (err) {
       logger(err);
