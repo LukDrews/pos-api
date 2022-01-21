@@ -1,5 +1,5 @@
 const { ValidationError } = require("../utils/errors");
-module.exports = function (debug, db, sharp) {
+module.exports = function (debug, db) {
   const logger = debug.extend("users");
   const User = db.user;
   const Role = db.role;
@@ -24,9 +24,9 @@ module.exports = function (debug, db, sharp) {
         const { buffer, originalname } = image;
         const timestamp = new Date().toISOString();
         const ref = `${timestamp}-${originalname}.webp`;
-        await sharp(buffer)
-          .webp({ quality: 20 })
-          .toFile("./uploads/" + ref);
+        // await sharp(buffer)
+        //   .webp({ quality: 20 })
+        //   .toFile("./uploads/" + ref);
         link = `http://localhost:3000/${ref}`;
       }
 

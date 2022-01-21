@@ -36,9 +36,9 @@ module.exports = function (debug, db) {
         const { buffer, originalname } = image;
         const timestamp = new Date().toISOString();
         const ref = `${timestamp}-${originalname}.webp`;
-        await sharp(buffer)
-          .webp({ quality: 20 })
-          .toFile("./uploads/" + ref);
+        // await sharp(buffer)
+        //   .webp({ quality: 20 })
+        //   .toFile("./uploads/" + ref);
         link = `http://localhost:3000/${ref}`;
       }
 

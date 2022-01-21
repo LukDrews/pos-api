@@ -1,6 +1,5 @@
 const express = require("express");
 const multer = require("multer");
-const sharp = require("sharp");
 const logger = require("morgan");
 const cors = require("cors");
 const fs = require("fs");
@@ -11,7 +10,6 @@ const { PrismaClient, Prisma } = require("@prisma/client");
 const v1ApiDoc = require("./api/v1/api-doc");
 const debug = require("debug")("api");
 const errDebug = debug.extend("error");
-
 
 const app = express();
 const storage = multer.memoryStorage();
@@ -34,7 +32,7 @@ const prisma = new PrismaClient();
 initialize({
   app,
   apiDoc: { ...v1ApiDoc },
-  dependencies: { debug, db: prisma, Prisma, Dinero, sharp },
+  dependencies: { debug, db: prisma, Prisma, Dinero },
   paths: "./api/v1/routes",
   consumesMiddleware: {
     "application/json": express.json(),
