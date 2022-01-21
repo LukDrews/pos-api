@@ -14,8 +14,12 @@ module.exports = function (debug, db, Dinero) {
     const userUuid = req.body.userUuid;
 
     try {
-      const cartItems = await CartItem.findMany({ include: { product: true } });
-      const user = await User.findUnique({ where: { uuid: userUuid } });
+      const cartItems = await CartItem.findMany({ select: { product: true, count: true } });
+      const user = {
+        connect: {
+          uuid: userUuid,
+        },
+      };
 
       // create OrderItems
       let totalAmount = 0;
@@ -29,22 +33,24 @@ module.exports = function (debug, db, Dinero) {
         totalAmount += amount;
 
         items.push({
-          productId: product.id,
+          product: {
+            connect: {
+              uuid: product.uuid,
+            },
+          },
           count: cartItem.count,
           amount: amount,
         });
       }
       const order = await Order.create({
         data: {
-          userId: user.id,
+          user,
           amount: totalAmount,
           items: {
             create: items,
           },
         },
-        include: {
-          items: true,
-        },
+        include: { items: true },
       });
 
       await CartItem.deleteMany({});

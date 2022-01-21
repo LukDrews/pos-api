@@ -1,7 +1,6 @@
 module.exports = function (debug, db, Prisma) {
   const logger = debug.extend("carts");
   const CartItem = db.cartItem;
-  const Product = db.product;
 
   let operations = {
     POST: add,
@@ -12,19 +11,16 @@ module.exports = function (debug, db, Prisma) {
   async function add(req, res, next) {
     const productUuid = req.body.productUuid;
     try {
-      const product = await Product.findUnique({
-        where: { uuid: productUuid },
-      });
       // if item in cart, increment count, else add item to cart
       let cartItem = await CartItem.upsert({
-        where: { productId: product.id },
+        where: { productUuid },
         update: {
           count: {
             increment: 1,
           },
         },
         create: {
-          productId: product.id,
+          productUuid,
         },
       });
       return res.json(cartItem);
@@ -51,12 +47,8 @@ module.exports = function (debug, db, Prisma) {
   async function remove(req, res, next) {
     const productUuid = req.body.productUuid;
     try {
-      const product = await Product.findUnique({
-        where: { uuid: productUuid },
-      });
-
       const cartItem = await CartItem.update({
-        where: { productId: product.id },
+        where: { productUuid },
         data: {
           count: {
             decrement: 1,
@@ -66,7 +58,7 @@ module.exports = function (debug, db, Prisma) {
 
       if (cartItem.count === 0) {
         await CartItem.delete({
-          where: { productId: product.id },
+          where: { productUuid },
         });
         return res.json();
       } else {

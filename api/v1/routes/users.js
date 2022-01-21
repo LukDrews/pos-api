@@ -14,13 +14,9 @@ module.exports = function (debug, db, sharp) {
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
     const birthDate = new Date(req.body.birthDate).toISOString();
-    const role = req.body.role;
-    const group = req.body.group;
+    const roleName = req.body.role;
+    const groupName = req.body.group;
     const image = req.files[0];
-
-    const roleDB = await Role.findUnique({ where: { name: role } });
-
-    const groupDB = await Group.findUnique({ where: { name: group } });
 
     try {
       let link = null;
@@ -34,27 +30,28 @@ module.exports = function (debug, db, sharp) {
         link = `http://localhost:3000/${ref}`;
       }
 
+      const role = {
+        connect: {
+          name: roleName,
+        },
+      };
+
+      const group = {
+        connect: {
+          name: groupName,
+        },
+      };
+
       const user = await User.create({
         data: {
           firstName,
           lastName,
           birthDate,
-          role: {
-            connect: {
-              id: roleDB.id,
-            },
-          },
-          group: {
-            connect: {
-              id: groupDB.id,
-            },
-          },
+          role,
+          group,
           imageLink: link,
         },
-        include: {
-          role: true,
-          group: true,
-        },
+        include: { role: true, group: true },
       });
       return res.json(user);
     } catch (err) {

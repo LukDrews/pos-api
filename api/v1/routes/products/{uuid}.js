@@ -19,10 +19,10 @@ module.exports = function (debug, db) {
   };
 
   async function update(req, res, next) {
-    const productUuid = req.params.uuid;
+    const uuid = req.params.uuid;
     try {
       const product = await Product.update({
-        where: { uuid: productUuid },
+        where: { uuid },
         data: { ...req.body },
       });
       return res.json(product);

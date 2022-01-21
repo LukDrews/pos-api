@@ -21,25 +21,47 @@ module.exports = function (debug, db) {
   };
 
   async function update(req, res, next) {
-    const userUuid = req.params.uuid;
+    const uuid = req.params.uuid;
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
     const birthDate = new Date(req.body.birthDate).toISOString();
-    const role = req.body.role;
-    const group = req.body.group;
+    const roleName = req.body.role;
+    const groupName = req.body.group;
+    const image = req.files[0];
+
 
     try {
-      // TODO add error handling for
-      const roleDB = await Role.findUnique({ where: { name: role } });
-      const groupDB = await Group.findUnique({ where: { name: group } });
+      let link = null;
+      if (image) {
+        const { buffer, originalname } = image;
+        const timestamp = new Date().toISOString();
+        const ref = `${timestamp}-${originalname}.webp`;
+        await sharp(buffer)
+          .webp({ quality: 20 })
+          .toFile("./uploads/" + ref);
+        link = `http://localhost:3000/${ref}`;
+      }
+
+      const role = {
+        connect: {
+          name: roleName,
+        },
+      };
+
+      const group = {
+        connect: {
+          name: groupName,
+        },
+      };
       const user = await User.update({
-        where: { uuid: userUuid },
+        where: { uuid },
         data: {
           firstName,
           lastName,
           birthDate,
-          roleId: roleDB.id,
-          groupId: groupDB.id,
+          role,
+          group,
+          imageLink: link,
         },
         include: { role: true, group: true, orders: true },
       });
@@ -83,8 +105,9 @@ module.exports = function (debug, db) {
     operationId: "put-users-id",
     tags: [],
     requestBody: {
+      required: true,
       content: {
-        "application/json": {
+        "multipart/form-data": {
           schema: {
             type: "object",
             properties: {
@@ -108,6 +131,10 @@ module.exports = function (debug, db) {
               group: {
                 type: "string",
                 example: "Group 1",
+              },
+              image: {
+                type: "string",
+                format: "binary",
               },
             },
           },
