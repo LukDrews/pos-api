@@ -1,8 +1,8 @@
 module.exports = function (debug, db) {
   const logger = debug.extend("users");
-  const User = db.models.User;
-  const Role = db.models.Role;
-  const Group = db.models.Group;
+  const User = db.user;
+  const Role = db.role;
+  const Group = db.group;
 
   const parameters = [
     {
@@ -21,24 +21,49 @@ module.exports = function (debug, db) {
   };
 
   async function update(req, res, next) {
-    const userUuid = req.params.uuid;
+    const uuid = req.params.uuid;
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
-    const birthDate = req.body.birthDate;
-    const role = req.body.role;
-    const group = req.body.group;
+    const birthDate = new Date(req.body.birthDate).toISOString();
+    const roleName = req.body.role;
+    const groupName = req.body.group;
+    const image = req.files[0];
+
 
     try {
-      // TODO add error handling for
-      const roleDB = await Role.findOne({ where: { name: role } });
-      const groupDB = await Group.findOne({ where: { name: group } });
-      const user = await User.findOne({ where: { uuid: userUuid } });
-      await user.update({
-        firstName,
-        lastName,
-        birthDate,
-        roleId: roleDB.id,
-        groupId: groupDB.id,
+      let link = null;
+      if (image) {
+        const { buffer, originalname } = image;
+        const timestamp = new Date().toISOString();
+        const ref = `${timestamp}-${originalname}.webp`;
+        // await sharp(buffer)
+        //   .webp({ quality: 20 })
+        //   .toFile("./uploads/" + ref);
+        link = `http://localhost:3000/${ref}`;
+      }
+
+      const role = {
+        connect: {
+          name: roleName,
+        },
+      };
+
+      const group = {
+        connect: {
+          name: groupName,
+        },
+      };
+      const user = await User.update({
+        where: { uuid },
+        data: {
+          firstName,
+          lastName,
+          birthDate,
+          role,
+          group,
+          imageLink: link,
+        },
+        include: { role: true, group: true, orders: true },
       });
       return res.json(user);
     } catch (err) {
@@ -50,9 +75,9 @@ module.exports = function (debug, db) {
   async function read(req, res, next) {
     const uuid = req.params.uuid;
     try {
-      const user = await User.findOne({
+      const user = await User.findUnique({
         where: { uuid },
-        include: ["role", "group", "orders"],
+        include: { role: true, group: true, orders: true },
       });
       return res.json(user);
     } catch (err) {
@@ -64,7 +89,7 @@ module.exports = function (debug, db) {
   async function del(req, res, next) {
     const uuid = req.params.uuid;
     try {
-      const user = await User.destroy({
+      const user = await User.delete({
         where: { uuid },
       });
       return res.json(user);
@@ -80,8 +105,9 @@ module.exports = function (debug, db) {
     operationId: "put-users-id",
     tags: [],
     requestBody: {
+      required: true,
       content: {
-        "application/json": {
+        "multipart/form-data": {
           schema: {
             type: "object",
             properties: {
@@ -105,6 +131,10 @@ module.exports = function (debug, db) {
               group: {
                 type: "string",
                 example: "Group 1",
+              },
+              image: {
+                type: "string",
+                format: "binary",
               },
             },
           },

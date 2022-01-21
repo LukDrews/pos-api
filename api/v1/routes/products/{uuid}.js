@@ -1,6 +1,6 @@
 module.exports = function (debug, db) {
   const logger = debug.extend("products");
-  const Product = db.models.Product;
+  const Product = db.product;
 
   const parameters = [
     {
@@ -19,10 +19,12 @@ module.exports = function (debug, db) {
   };
 
   async function update(req, res, next) {
-    const productUuid = req.params.uuid;
+    const uuid = req.params.uuid;
     try {
-      const product = await Product.findOne({ where: { uuid: productUuid } });
-      product.update(req.body);
+      const product = await Product.update({
+        where: { uuid },
+        data: { ...req.body },
+      });
       return res.json(product);
     } catch (err) {
       logger(err);
@@ -33,7 +35,7 @@ module.exports = function (debug, db) {
   async function read(req, res, next) {
     const uuid = req.params.uuid;
     try {
-      const product = await Product.findOne({
+      const product = await Product.findUnique({
         where: { uuid },
       });
       return res.json(product);
@@ -46,7 +48,7 @@ module.exports = function (debug, db) {
   async function del(req, res, next) {
     const uuid = req.params.uuid;
     try {
-      await Product.destroy({
+      await Product.delete({
         where: { uuid },
       });
       return res.json();

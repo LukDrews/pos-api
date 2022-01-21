@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./db/dev.sqlite"
+}
+
+model User {
+  uuid      String   @id @unique @default(uuid())
+  firstName String
+  lastName  String
+  birthDate DateTime
+  role      Role     @relation(fields: [roleUuid], references: [uuid])
+  roleUuid  String
+  group     Group    @relation(fields: [groupUuid], references: [uuid])
+  groupUuid String
+  orders    Order[]
+  imageLink String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Group {
+  uuid      String   @id @unique @default(uuid())
+  name      String   @unique
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  uuid  String @id @unique @default(uuid())
+  name  String @unique
+  users User[]
+}
+
+model Product {
+  uuid       String      @id @unique() @default(uuid())
+  name       String      @unique()
+  price      Int
+  barcode    String?     @unique()
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+}
+
+model Order {
+  uuid      String      @id @unique() @default(uuid())
+  user      User        @relation(fields: [userUuid], references: [uuid])
+  userUuid  String
+  amount    Int?
+  items     OrderItem[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model OrderItem {
+  uuid        String   @id @unique() @default(uuid())
+  order       Order    @relation(fields: [orderUuid], references: [uuid])
+  orderUuid   String
+  product     Product  @relation(fields: [productUuid], references: [uuid])
+  productUuid String
+  count       Int      @default(1)
+  amount      Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CartItem {
+  uuid        String   @id @unique() @default(uuid())
+  product     Product  @relation(fields: [productUuid], references: [uuid])
+  productUuid String   @unique()
+  count       Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

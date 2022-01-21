@@ -1,9 +1,9 @@
 module.exports = function (debug, db, Dinero) {
   const logger = debug.extend("orders");
-  const Order = db.models.Order;
-  const OrderItem = db.models.OrderItem;
-  const User = db.models.User;
-  const CartItem = db.models.CartItem;
+  const Order = db.order;
+  const OrderItem = db.orderItem;
+  const User = db.user;
+  const CartItem = db.cartItem;
 
   let operations = {
     POST: create,
@@ -14,31 +14,46 @@ module.exports = function (debug, db, Dinero) {
     const userUuid = req.body.userUuid;
 
     try {
-      const cartItems = await CartItem.findAll({ include: "product" });
-      const user = await User.findOne({ where: { uuid: userUuid } });
-      const order = await Order.create({ userId: user.id });
+      const cartItems = await CartItem.findMany({ select: { product: true, count: true } });
+      const user = {
+        connect: {
+          uuid: userUuid,
+        },
+      };
 
       // create OrderItems
       let totalAmount = 0;
       const items = [];
       for (const cartItem of cartItems) {
         const product = cartItem.product;
+        // Calculate and save the total amount to accommodate price changes.
         const amount = Dinero({ amount: product.price })
           .multiply(cartItem.count)
           .getAmount();
         totalAmount += amount;
 
         items.push({
-          orderId: order.id,
-          productId: product.id,
+          product: {
+            connect: {
+              uuid: product.uuid,
+            },
+          },
           count: cartItem.count,
           amount: amount,
         });
       }
-      await OrderItem.bulkCreate(items);
-      await order.update({ amount: totalAmount });
+      const order = await Order.create({
+        data: {
+          user,
+          amount: totalAmount,
+          items: {
+            create: items,
+          },
+        },
+        include: { items: true },
+      });
 
-      await CartItem.destroy({ truncate: true });
+      await CartItem.deleteMany({});
       return res.json(order);
     } catch (err) {
       logger(err);
@@ -48,7 +63,9 @@ module.exports = function (debug, db, Dinero) {
 
   async function list(req, res, next) {
     try {
-      const orders = await Order.findAll({ include: ["user", "items"] });
+      const orders = await Order.findMany({
+        include: { user: true, items: true },
+      });
       return res.json(orders);
     } catch (err) {
       logger(err);

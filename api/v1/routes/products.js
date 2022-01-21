@@ -1,6 +1,6 @@
-module.exports = function (debug, db, Sequelize) {
+module.exports = function (debug, db) {
   const logger = debug.extend("products");
-  const Product = db.models.Product;
+  const Product = db.product
 
   let operations = {
     POST: create,
@@ -13,20 +13,20 @@ module.exports = function (debug, db, Sequelize) {
     const barcode = req.body.barcode;
 
     try {
-      const product = await Product.create({ name, price, barcode });
+      const product = await Product.create({
+        data: { name, price, barcode },
+      });
+
       return res.json(product);
     } catch (err) {
       logger(err);
-      if (err instanceof Sequelize.UniqueConstraintError) {
-        return res.status(409).json({ errors: err.errors });
-      }
       return res.status(500).json();
     }
   }
 
   async function list(req, res, next) {
     try {
-      const products = await Product.findAll();
+      const products = await Product.findMany();
       return res.json(products);
     } catch (err) {
       logger(err);

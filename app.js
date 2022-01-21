@@ -1,16 +1,15 @@
 const express = require("express");
 const multer = require("multer");
-const sharp = require("sharp");
 const logger = require("morgan");
 const cors = require("cors");
 const fs = require("fs");
 const { initialize } = require("express-openapi");
 const Dinero = require("dinero.js");
+const { PrismaClient, Prisma } = require("@prisma/client");
+
 const v1ApiDoc = require("./api/v1/api-doc");
 const debug = require("debug")("api");
 const errDebug = debug.extend("error");
-
-const { sequelize, Sequelize } = require("./api/v1/models");
 
 const app = express();
 const storage = multer.memoryStorage();
@@ -18,22 +17,22 @@ const upload = multer({ storage });
 
 app.use("/static", express.static("./uploads"));
 app.use("/static", express.static("./public"));
-
-app.use(cors());
-app.use(logger("dev"));
-app.use(express.urlencoded({ extended: false }));
-
 fs.access("./uploads", (error) => {
   if (error) {
     fs.mkdirSync("./uploads");
   }
 });
 
+app.use(cors());
+app.use(logger("dev"));
+app.use(express.urlencoded({ extended: false }));
+
+const prisma = new PrismaClient();
 // create openapi-config
 initialize({
   app,
   apiDoc: { ...v1ApiDoc },
-  dependencies: { debug, db: sequelize, Sequelize, Dinero, sharp },
+  dependencies: { debug, db: prisma, Prisma, Dinero },
   paths: "./api/v1/routes",
   consumesMiddleware: {
     "application/json": express.json(),
