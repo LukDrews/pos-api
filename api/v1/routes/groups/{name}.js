@@ -1,6 +1,6 @@
-module.exports = function (debug, prismaDB) {
+module.exports = function (debug, db) {
   const logger = debug.extend("groups");
-  const Group = prismaDB.group;
+  const Group = db.group;
 
   const parameters = [
     {

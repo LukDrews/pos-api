@@ -1,6 +1,6 @@
-module.exports = function (debug, prismaDB) {
+module.exports = function (debug, db) {
   const logger = debug.extend("products");
-  const Product = prismaDB.product
+  const Product = db.product
 
   let operations = {
     POST: create,

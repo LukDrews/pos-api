@@ -1,9 +1,9 @@
 const { ValidationError } = require("../utils/errors");
-module.exports = function (debug, prismaDB, sharp) {
+module.exports = function (debug, db, sharp) {
   const logger = debug.extend("users");
-  const User = prismaDB.user;
-  const Role = prismaDB.role;
-  const Group = prismaDB.group;
+  const User = db.user;
+  const Role = db.role;
+  const Group = db.group;
 
   let operations = {
     POST: create,

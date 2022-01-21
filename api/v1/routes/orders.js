@@ -1,9 +1,9 @@
-module.exports = function (debug, prismaDB, Dinero) {
+module.exports = function (debug, db, Dinero) {
   const logger = debug.extend("orders");
-  const Order = prismaDB.order;
-  const OrderItem = prismaDB.orderItem;
-  const User = prismaDB.user;
-  const CartItem = prismaDB.cartItem;
+  const Order = db.order;
+  const OrderItem = db.orderItem;
+  const User = db.user;
+  const CartItem = db.cartItem;
 
   let operations = {
     POST: create,

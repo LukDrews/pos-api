@@ -19,21 +19,22 @@ const upload = multer({ storage });
 
 app.use("/static", express.static("./uploads"));
 app.use("/static", express.static("./public"));
-
-app.use(cors());
-app.use(logger("dev"));
-app.use(express.urlencoded({ extended: false }));
-
 fs.access("./uploads", (error) => {
   if (error) {
     fs.mkdirSync("./uploads");
   }
 });
+
+app.use(cors());
+app.use(logger("dev"));
+app.use(express.urlencoded({ extended: false }));
+
+const prisma = new PrismaClient();
 // create openapi-config
 initialize({
   app,
   apiDoc: { ...v1ApiDoc },
-  dependencies: { debug, prismaDB: new PrismaClient(), Prisma, Dinero, sharp },
+  dependencies: { debug, db: prisma, Prisma, Dinero, sharp },
   paths: "./api/v1/routes",
   consumesMiddleware: {
     "application/json": express.json(),
