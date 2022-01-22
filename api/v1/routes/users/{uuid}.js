@@ -1,8 +1,6 @@
 module.exports = function (debug, db) {
   const logger = debug.extend("users");
   const User = db.user;
-  const Role = db.role;
-  const Group = db.group;
 
   const parameters = [
     {
@@ -25,8 +23,8 @@ module.exports = function (debug, db) {
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
     const birthDate = new Date(req.body.birthDate).toISOString();
-    const roleName = req.body.role;
-    const groupName = req.body.group;
+    const roleUuid = req.body.roleUuid;
+    const groupUuid = req.body.groupUuid;
     const image = req.files[0];
 
 
@@ -44,13 +42,13 @@ module.exports = function (debug, db) {
 
       const role = {
         connect: {
-          name: roleName,
+          uuid: roleUuid,
         },
       };
 
       const group = {
         connect: {
-          name: groupName,
+          uuid: groupUuid,
         },
       };
       const user = await User.update({
@@ -124,13 +122,11 @@ module.exports = function (debug, db) {
                 format: "date",
                 example: "2017-07-21",
               },
-              role: {
+              roleUuid: {
                 type: "string",
-                example: "customer",
               },
-              group: {
+              groupUuid: {
                 type: "string",
-                example: "Group 1",
               },
               image: {
                 type: "string",

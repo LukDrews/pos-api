@@ -42,6 +42,10 @@ initialize({
           return next(err);
         }
         // Handle both single and multiple files
+        if (req.files.length === 0) {
+          // early exit
+          return next();
+        }
         const filesMap = req.files.reduce(
           (acc, f) =>
             Object.assign(acc, {

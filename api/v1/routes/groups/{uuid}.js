@@ -4,11 +4,11 @@ module.exports = function (debug, db) {
 
   const parameters = [
     {
-      name: "name",
+      name: "uuid",
       in: "path",
       type: "string",
       required: true,
-      description: "name of a group",
+      description: "Uuid of a group",
     },
   ];
 
@@ -19,12 +19,12 @@ module.exports = function (debug, db) {
   };
 
   async function update(req, res, next) {
-    const name = req.params.name;
-    const newName = req.body.name;
+    const uuid = req.params.uuid;
+    const name = req.body.name;
     try {
       const group = await Group.update({
-        where: { name },
-        data: { name: newName },
+        where: { uuid },
+        data: { name },
       });
       return res.json(group);
     } catch (err) {
@@ -34,10 +34,10 @@ module.exports = function (debug, db) {
   }
 
   async function read(req, res, next) {
-    const name = req.params.name;
+    const uuid = req.params.uuid;
     try {
       const group = await Group.findUnique({
-        where: { name },
+        where: { uuid },
         include: {
           users: true,
         },
@@ -50,10 +50,10 @@ module.exports = function (debug, db) {
   }
 
   async function del(req, res, next) {
-    const name = req.params.name;
+    const uuid = req.params.uuid;
     try {
       await Group.delete({
-        where: { name },
+        where: { uuid },
       });
       return res.json();
     } catch (err) {
