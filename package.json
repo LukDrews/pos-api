@@ -6,7 +6,7 @@
     "start": "node ./bin/dev",
     "dev": "DEBUG=* nodemon ./bin/dev --ignore ./api/v1/prisma/db --ignore ./uploads --inspect",
     "migrate": "npx prisma migrate dev",
-    "build": "npx prisma migrate deploy && npx prisma generate"
+    "build": "npx prisma migrate deploy && npx prisma generate && npx prisma db seed"
   },
   "dependencies": {
     "@prisma/client": "^3.8.1",
@@ -25,6 +25,7 @@
     "prisma": "^3.8.1"
   },
   "prisma": {
-    "schema": "api/v1/prisma/schema.prisma"
+    "schema": "api/v1/prisma/schema.prisma",
+    "seed": "node api/v1/prisma/seed.js"
   }
 }
