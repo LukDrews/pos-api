@@ -4,7 +4,7 @@
 #### **Development**
 ```sh
 npm install
-npx prisma migrate dev # create database
+npm run migrate # create database
 npm run dev
 ```
 

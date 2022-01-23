@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/dev",
-    "dev": "DEBUG=* nodemon ./bin/dev --ignore ./api/v1/prisma/db --ignore ./uploads --inspect"
+    "dev": "DEBUG=* nodemon ./bin/dev --ignore ./api/v1/prisma/db --ignore ./uploads --inspect",
+    "migrate": "npx prisma migrate dev",
+    "build": "npx prisma migrate deploy && npx prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^3.8.1",
