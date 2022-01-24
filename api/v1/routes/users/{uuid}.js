@@ -1,4 +1,4 @@
-module.exports = function (debug, db) {
+module.exports = function (debug, db, Prisma) {
   const logger = debug.extend("users");
   const User = db.user;
 
@@ -26,7 +26,6 @@ module.exports = function (debug, db) {
     const roleUuid = req.body.roleUuid;
     const groupUuid = req.body.groupUuid;
     const image = req.files[0];
-
 
     try {
       let link = null;
@@ -92,8 +91,19 @@ module.exports = function (debug, db) {
       });
       return res.json(user);
     } catch (err) {
-      logger(err);
-      return res.status(500).json();
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === "P2003") {
+          return res.status(409).json({
+            msg: "can't delete resource with entities attached. Remove all entities from the resource and try again.",
+          });
+        } else if (err.code === "P2025") {
+          // P2025: An operation failed because it depends on one or more records that were required but not found.
+          return res.status(404).json();
+        }
+      } else {
+        logger(err);
+        return res.status(500).json();
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-module.exports = function (debug, db) {
+module.exports = function (debug, db, Prisma) {
   const logger = debug.extend("products");
   const Product = db.product;
 
@@ -54,6 +54,12 @@ module.exports = function (debug, db) {
       return res.json();
     } catch (err) {
       logger(err);
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        // P2025: An operation failed because it depends on one or more records that were required but not found.
+        if (err.code === "P2025") {
+          return res.status(404).json();
+        }
+      }
       return res.status(500).json();
     }
   }
