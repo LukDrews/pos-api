@@ -6,13 +6,16 @@ module.exports = function (debug, db, Prisma) {
     {
       name: "uuid",
       in: "path",
-      type: "string",
+      schema: {
+        type: "string",
+      },
       required: true,
       description: "Uuid of a role",
     },
   ];
 
   let operations = {
+    parameters,
     PUT: update,
     GET: read,
     DELETE: del,
@@ -150,8 +153,5 @@ module.exports = function (debug, db, Prisma) {
     },
   };
 
-  return {
-    ...operations,
-    ...parameters,
-  };
+  return operations
 };

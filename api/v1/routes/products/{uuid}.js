@@ -6,13 +6,16 @@ module.exports = function (debug, db, Prisma) {
     {
       name: "uuid",
       in: "path",
-      type: "string",
+      schema: {
+        type: "string",
+      },
       required: true,
       description: "UUID of a Product",
     },
   ];
 
   let operations = {
+    parameters,
     PUT: update,
     GET: read,
     DELETE: del,
@@ -144,8 +147,5 @@ module.exports = function (debug, db, Prisma) {
     },
   };
 
-  return {
-    ...operations,
-    ...parameters,
-  };
+  return operations;
 };
