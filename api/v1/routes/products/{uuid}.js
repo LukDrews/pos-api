@@ -86,7 +86,7 @@ module.exports = function (debug, db, Prisma) {
               },
               barcode: {
                 type: "string",
-                pattern: "^[0-9]{13}$",
+                format: "barcode",
               },
             },
           },

@@ -1,6 +1,6 @@
 module.exports = function (debug, db) {
   const logger = debug.extend("products");
-  const Product = db.product
+  const Product = db.product;
 
   let operations = {
     POST: create,
@@ -55,7 +55,7 @@ module.exports = function (debug, db) {
               },
               barcode: {
                 type: "string",
-                pattern: "^[0-9]{13}$",
+                format: "barcode",
               },
             },
             required: ["name", "price"],
