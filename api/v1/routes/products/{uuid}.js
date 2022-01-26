@@ -8,6 +8,7 @@ module.exports = function (debug, db, Prisma) {
       in: "path",
       schema: {
         type: "string",
+        format: "uuid",
       },
       required: true,
       description: "UUID of a Product",

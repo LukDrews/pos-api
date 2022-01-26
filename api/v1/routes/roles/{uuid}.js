@@ -8,6 +8,7 @@ module.exports = function (debug, db, Prisma) {
       in: "path",
       schema: {
         type: "string",
+        format: "uuid",
       },
       required: true,
       description: "Uuid of a role",
@@ -153,5 +154,5 @@ module.exports = function (debug, db, Prisma) {
     },
   };
 
-  return operations
+  return operations;
 };

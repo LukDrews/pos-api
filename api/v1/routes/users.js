@@ -81,7 +81,13 @@ module.exports = function (debug, db) {
         "multipart/form-data": {
           schema: {
             type: "object",
-            required: ["firstName", "lastName", "birthDate", "groupUuid", "roleUuid"],
+            required: [
+              "firstName",
+              "lastName",
+              "birthDate",
+              "groupUuid",
+              "roleUuid",
+            ],
             properties: {
               firstName: {
                 type: "string",
@@ -98,9 +104,11 @@ module.exports = function (debug, db) {
               },
               roleUuid: {
                 type: "string",
+                format: "uuid",
               },
               groupUuid: {
                 type: "string",
+                format: "uuid",
               },
               image: {
                 type: "string",

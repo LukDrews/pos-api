@@ -14,7 +14,9 @@ module.exports = function (debug, db, Dinero) {
     const userUuid = req.body.userUuid;
 
     try {
-      const cartItems = await CartItem.findMany({ select: { product: true, count: true } });
+      const cartItems = await CartItem.findMany({
+        select: { product: true, count: true },
+      });
       const user = {
         connect: {
           uuid: userUuid,
@@ -86,6 +88,7 @@ module.exports = function (debug, db, Dinero) {
             properties: {
               userUuid: {
                 type: "string",
+                format: "uuid",
               },
             },
             required: ["userUuid"],
