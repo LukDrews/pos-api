@@ -25,7 +25,7 @@ module.exports = function (debug, db) {
         // await sharp(buffer)
         //   .webp({ quality: 20 })
         //   .toFile("./uploads/" + ref);
-        link = `http://localhost:3000/${ref}`;
+        imageUrl = `http://localhost:3000/${ref}`;
       }
 
       const role = {
@@ -47,7 +47,7 @@ module.exports = function (debug, db) {
           birthDate,
           role,
           group,
-          imageLink: link,
+          imageUrl,
         },
         include: { role: true, group: true },
       });

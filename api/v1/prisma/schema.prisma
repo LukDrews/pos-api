@@ -17,7 +17,7 @@ model User {
   group     Group    @relation(fields: [groupUuid], references: [uuid])
   groupUuid String
   orders    Order[]
-  imageLink String?
+  imageUrl  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
