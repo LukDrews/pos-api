@@ -1,28 +1,41 @@
 module.exports = function (debug, db, Prisma) {
   const logger = debug.extend("cart");
   const CartItem = db.cartItem;
+  const Product = db.product;
 
   let operations = {
     POST: add,
     GET: list,
   };
-
+  /**
+   * If product is in cart, increment count, else add product to cart
+   * @see https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#update-or-create-a-related-record
+   */
   async function add(req, res, next) {
-    const productUuid = req.body.productUuid;
+    let productUuid = req.body.productUuid;
+    const barcode = req.body.barcode;
     try {
-      // if item in cart, increment count, else add item to cart
-      let cartItem = await CartItem.upsert({
-        where: { productUuid },
-        update: {
-          count: {
-            increment: 1,
+      const product = await Product.update({
+        where: { uuid: productUuid, barcode },
+        data: {
+          cartItem: {
+            upsert: {
+              create: {},
+              update: {
+                count: {
+                  increment: 1,
+                },
+              },
+            },
           },
         },
-        create: {
-          productUuid,
+        select: {
+          cartItem: {
+            include: { product: true },
+          },
         },
       });
-      return res.json(cartItem);
+      return res.json(product.cartItem);
     } catch (err) {
       logger(err);
       return res.status(500).json();
@@ -52,13 +65,25 @@ module.exports = function (debug, db, Prisma) {
       content: {
         "application/json": {
           schema: {
-            type: "object",
-            properties: {
-              productUuid: {
-                type: "string",
-                format: "uuid",
+            oneOf: [
+              {
+                properties: {
+                  productUuid: {
+                    type: "string",
+                  },
+                },
+                required: ["productUuid"],
               },
-            },
+              {
+                properties: {
+                  barcode: {
+                    type: "string",
+                  },
+                },
+                required: ["barcode"],
+              },
+            ],
+            type: "object",
           },
         },
       },
