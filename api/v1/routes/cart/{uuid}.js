@@ -26,6 +26,9 @@ module.exports = function (debug, db, Prisma) {
     const uuid = req.params.uuid;
     const count = req.body.count;
     try {
+      if (count === 0) {
+        return res.status(409).json();
+      }
       const cartItem = await CartItem.update({
         where: { uuid },
         data: { count },
