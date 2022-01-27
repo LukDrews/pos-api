@@ -60,17 +60,17 @@ async function main() {
     {
       name: "Snickers",
       price: 100,
-      barcode: "1570315473264",
+      barcode: "4250519647265",
     },
     {
-      name: "Mars",
+      name: "Paulaner Spezi",
       price: 110,
-      barcode: "8071683040857",
+      barcode: "4066600603405",
     },
     {
       name: "Twix",
       price: 140,
-      barcode: "5457459429383",
+      barcode: "4260179234378",
     },
   ];
   for (let idx in products) {
