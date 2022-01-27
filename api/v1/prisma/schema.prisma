@@ -16,6 +16,7 @@ model User {
   roleUuid  String
   group     Group    @relation(fields: [groupUuid], references: [uuid])
   groupUuid String
+  barcode   String?  @unique
   orders    Order[]
   imageUrl  String?
   createdAt DateTime @default(now())
