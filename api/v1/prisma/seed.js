@@ -73,15 +73,31 @@ async function main() {
       barcode: "5457459429383",
     },
   ];
-  for (let product of products) {
-    await prisma.product.upsert({
+  for (let idx in products) {
+    const product = products[idx];
+    products[idx] = await prisma.product.upsert({
       where: { name: product.name },
       update: {},
       create: product,
     });
   }
 
-  // Order?
+  // Cart items
+  for (let idx in products) {
+    const product = products[idx];
+    const cartItem = await prisma.cartItem.upsert({
+      where: { productUuid: product.uuid },
+      update: {},
+      create: {
+        product: {
+          connect: {
+            uuid: product.uuid,
+          },
+        },
+        count: Number(idx) + 1,
+      },
+    });
+  }
 }
 
 main()
