@@ -6,7 +6,8 @@ CREATE TABLE "User" (
     "birthDate" DATETIME NOT NULL,
     "roleUuid" TEXT NOT NULL,
     "groupUuid" TEXT NOT NULL,
-    "imageLink" TEXT,
+    "barcode" TEXT,
+    "imageUrl" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "User_roleUuid_fkey" FOREIGN KEY ("roleUuid") REFERENCES "Role" ("uuid") ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -72,6 +73,9 @@ CREATE TABLE "CartItem" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_uuid_key" ON "User"("uuid");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_barcode_key" ON "User"("barcode");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Group_uuid_key" ON "Group"("uuid");
