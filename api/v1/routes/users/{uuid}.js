@@ -33,7 +33,7 @@ module.exports = function (debug, db, Prisma) {
     const image = req.files[0];
 
     try {
-      let link = null;
+      let imageUrl = null;
       if (image) {
         const { buffer, originalname } = image;
         const timestamp = new Date().toISOString();
