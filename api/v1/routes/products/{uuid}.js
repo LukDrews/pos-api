@@ -24,10 +24,13 @@ module.exports = function (debug, db, Prisma) {
 
   async function update(req, res, next) {
     const uuid = req.params.uuid;
+    const name = req.body.name;
+    const price = req.body.price;
+    const barcode = req.body.barcode;
     try {
       const product = await Product.update({
         where: { uuid },
-        data: { ...req.body },
+        data: { name, price, barcode },
       });
       return res.json(product);
     } catch (err) {
