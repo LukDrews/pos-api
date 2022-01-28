@@ -11,7 +11,7 @@ module.exports = function (debug, db) {
         format: "ean13"
       },
       required: true,
-      description: "UUID of a Product",
+      description: "Barcode of a product",
     },
   ];
 
@@ -39,7 +39,7 @@ module.exports = function (debug, db) {
 
   read.apiDoc = {
     summary: "Get product",
-    description: "Get product via varcode",
+    description: "Get product via barcode",
     operationId: "get-product-barcode-barcode",
     tags: [],
     responses: {

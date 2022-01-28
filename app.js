@@ -45,6 +45,9 @@ initialize({
     ean13: function (input) {
       return barcode.isValidFormat(input, barcode.formats.ean13);
     },
+    ean8: function (input) {
+      return barcode.isValidFormat(input, barcode.formats.ean8);
+    },
   },
   consumesMiddleware: {
     "application/json": express.json(),

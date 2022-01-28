@@ -29,6 +29,7 @@ module.exports = function (debug, db, Prisma) {
     const birthDate = new Date(req.body.birthDate).toISOString();
     const roleUuid = req.body.roleUuid;
     const groupUuid = req.body.groupUuid;
+    const barcode = req.body.barcode;
     const image = req.files[0];
 
     try {
@@ -62,6 +63,7 @@ module.exports = function (debug, db, Prisma) {
           birthDate,
           role,
           group,
+          barcode,
           imageUrl,
         },
         include: { role: true, group: true, orders: true },
@@ -143,6 +145,10 @@ module.exports = function (debug, db, Prisma) {
               groupUuid: {
                 type: "string",
                 format: "uuid",
+              },
+              barcode: {
+                type: "string",
+                format: "ean8",
               },
               image: {
                 type: "string",

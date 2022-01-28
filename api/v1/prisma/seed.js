@@ -8,16 +8,19 @@ async function main() {
       firstName: "John",
       lastName: "Doe",
       birthDate: new Date("1990-12-24"),
+      barcode: "90311031",
     },
     {
       firstName: "Max",
       lastName: "Musterman",
       birthDate: new Date("2000-01-31"),
+      barcode: "90311017",
     },
     {
       firstName: "Test",
       lastName: "User",
       birthDate: new Date(),
+      barcode: "90311048",
     },
   ];
   // Roles
