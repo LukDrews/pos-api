@@ -55,7 +55,7 @@ module.exports = function (debug, db) {
               },
               barcode: {
                 type: "string",
-                format: "barcode",
+                format: "ean13",
               },
             },
             required: ["name", "price"],

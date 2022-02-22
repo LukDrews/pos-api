@@ -89,7 +89,7 @@ module.exports = function (debug, db, Prisma) {
               },
               barcode: {
                 type: "string",
-                format: "barcode",
+                format: "ean13",
               },
             },
           },
