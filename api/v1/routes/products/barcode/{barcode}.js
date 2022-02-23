@@ -2,16 +2,10 @@ module.exports = function (debug, db) {
   const logger = debug.extend("products");
   const Product = db.product;
 
+  // setup path parameters
   const parameters = [
     {
-      name: "barcode",
-      in: "path",
-      schema: {
-        type: "string",
-        format: "ean13"
-      },
-      required: true,
-      description: "Barcode of a product",
+      $ref: "#/components/parameters/ProductBarcodeParameter",
     },
   ];
 

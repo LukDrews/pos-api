@@ -67,23 +67,18 @@ module.exports = function (debug, db, Prisma) {
           schema: {
             oneOf: [
               {
+                $ref: "#/components/schemas/ProductBarcodeSelect",
+              },
+              {
                 properties: {
                   productUuid: {
                     type: "string",
+                    format: "uuid"
                   },
                 },
                 required: ["productUuid"],
               },
-              {
-                properties: {
-                  barcode: {
-                    type: "string",
-                  },
-                },
-                required: ["barcode"],
-              },
             ],
-            type: "object",
           },
         },
       },

@@ -78,21 +78,7 @@ module.exports = function (debug, db, Prisma) {
     operationId: "put-groups-id",
     tags: [],
     requestBody: {
-      content: {
-        "application/json": {
-          schema: {
-            // TODO use component schema -> same for post/create
-            type: "object",
-            properties: {
-              name: {
-                type: "string",
-                example: "Group 1",
-              },
-            },
-            required: ["name"],
-          },
-        },
-      },
+      $ref: "#/components/requestBodies/GroupBody"
     },
     responses: {
       200: {

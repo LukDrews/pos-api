@@ -43,22 +43,14 @@ module.exports = function (debug, db) {
       content: {
         "application/json": {
           schema: {
-            type: "object",
-            properties: {
-              name: {
-                type: "string",
-                example: "Snicker",
+            allOf: [
+              {
+                $ref: "#/components/schemas/Product",
               },
-              price: {
-                type: "integer",
-                example: 100,
+              {
+                required: ["name", "price"],
               },
-              barcode: {
-                type: "string",
-                format: "ean13",
-              },
-            },
-            required: ["name", "price"],
+            ],
           },
         },
       },

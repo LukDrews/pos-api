@@ -123,38 +123,7 @@ module.exports = function (debug, db, Prisma) {
       content: {
         "multipart/form-data": {
           schema: {
-            type: "object",
-            properties: {
-              firstName: {
-                type: "string",
-                example: "Max",
-              },
-              lastName: {
-                type: "string",
-                example: "Mustermann",
-              },
-              birthDate: {
-                type: "string",
-                format: "date",
-                example: "2017-07-21",
-              },
-              roleUuid: {
-                type: "string",
-                format: "uuid",
-              },
-              groupUuid: {
-                type: "string",
-                format: "uuid",
-              },
-              barcode: {
-                type: "string",
-                format: "ean8",
-              },
-              image: {
-                type: "string",
-                format: "binary",
-              },
-            },
+            $ref: "#/components/schemas/User",
           },
         },
       },

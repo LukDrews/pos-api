@@ -42,14 +42,7 @@ module.exports = function (debug, db) {
       content: {
         "application/json": {
           schema: {
-            type: "object",
-            properties: {
-              name: {
-                type: "string",
-                example: "customer",
-              },
-            },
-            required: ["name"],
+            $ref: "#/components/schemas/Role",
           },
         },
       },

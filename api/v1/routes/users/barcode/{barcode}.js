@@ -8,7 +8,7 @@ module.exports = function (debug, db) {
         in: "path",
         schema: {
           type: "string",
-          format: "ean8"
+          format: "userBarcode"
         },
         required: true,
         description: "Barcode of a user",

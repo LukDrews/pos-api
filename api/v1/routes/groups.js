@@ -35,20 +35,7 @@ module.exports = function (debug, db) {
     operationId: "post-groups",
     tags: [],
     requestBody: {
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              name: {
-                type: "string",
-                example: "Group 1",
-              },
-            },
-            required: ["name"],
-          },
-        },
-      },
+      $ref: "#/components/requestBodies/GroupBody"
     },
     responses: {
       200: {

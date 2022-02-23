@@ -86,15 +86,7 @@ module.exports = function (debug, db, Prisma) {
       content: {
         "application/json": {
           schema: {
-            // TODO use component schema -> same for post/create
-            type: "object",
-            properties: {
-              name: {
-                type: "string",
-                example: "customer",
-              },
-            },
-            required: ["name"],
+            $ref: "#/components/schemas/Role",
           },
         },
       },
