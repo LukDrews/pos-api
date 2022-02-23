@@ -6,8 +6,7 @@ const fs = require("fs");
 const { initialize } = require("express-openapi");
 const Dinero = require("dinero.js");
 const { PrismaClient, Prisma } = require("@prisma/client");
-
-const { barcode } = require("./libs/validators");
+const customFormats = require("./libs/customFormats");
 
 const v1ApiDoc = require("./api/v1/api-doc");
 const debug = require("debug")("api");
@@ -36,19 +35,7 @@ initialize({
   apiDoc: { ...v1ApiDoc },
   dependencies: { debug, db: prisma, Prisma, Dinero },
   paths: "./api/v1/routes",
-  customFormats: {
-    uuid: function (input) {
-      const uuidPattern =
-        /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
-      return uuidPattern.test(input);
-    },
-    ean13: function (input) {
-      return barcode.isValidFormat(input, barcode.formats.ean13);
-    },
-    ean8: function (input) {
-      return barcode.isValidFormat(input, barcode.formats.ean8);
-    },
-  },
+  customFormats: customFormats,
   consumesMiddleware: {
     "application/json": express.json(),
     "multipart/form-data": function (req, res, next) {
