@@ -15,7 +15,7 @@ module.exports = function (debug, orderService) {
   async function create(req, res, next) {
     const userUuid = req.body.userUuid;
     try {
-      const order = orderService.create(userUuid);
+      const order = await orderService.create(userUuid);
       return res.json(order);
     } catch (err) {
       logger(err);

@@ -30,7 +30,7 @@ module.exports = class TransactionService {
    * @param {string} orderUuid
    * @returns
    */
-  async createCreditTransaction(tx, amount, userUuid, orderUuid = undefined) {
+  async createCreditTransaction(tx, amount, userUuid) {
     // 1. Check if user has enough balance
     const currentUser = await tx.user.update({
       data: {
@@ -53,7 +53,6 @@ module.exports = class TransactionService {
       );
     }
 
-    const order = orderUuid ? { connect: { uuid: orderUuid } } : undefined;
 
     // 3. Create Credit transaction
     const transaction = await tx.transaction.create({
@@ -64,7 +63,6 @@ module.exports = class TransactionService {
             uuid: userUuid,
           },
         },
-        order,
       },
     });
     return transaction;
