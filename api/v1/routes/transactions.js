@@ -1,11 +1,11 @@
 /**
  *
  * @param {import("debug").Debugger} debug
- * @param {import("../services/OrderService")} orderService
+ * @param {import("../services/TransactionService")} transactionService
  * @returns
  */
-module.exports = function (debug, orderService) {
-  const logger = debug.extend("orders");
+module.exports = function (debug, transactionService) {
+  const logger = debug.extend("transactions");
 
   let operations = {
     POST: create,
@@ -13,10 +13,12 @@ module.exports = function (debug, orderService) {
   };
 
   async function create(req, res, next) {
+    const amount = req.body.amount;
     const userUuid = req.body.userUuid;
+
     try {
-      const order = orderService.create(userUuid);
-      return res.json(order);
+      const transaction = await transactionService.create(amount, userUuid);
+      return res.json(transaction);
     } catch (err) {
       logger(err);
       return res.status(500).json();
@@ -25,8 +27,8 @@ module.exports = function (debug, orderService) {
 
   async function list(req, res, next) {
     try {
-      const orders = await orderService.getAll();
-      return res.json(orders);
+      const transactions = await transactionService.getAll();
+      return res.json(transactions);
     } catch (err) {
       logger(err);
       return res.status(500).json();
@@ -34,29 +36,31 @@ module.exports = function (debug, orderService) {
   }
 
   create.apiDoc = {
-    summary: "Create order",
-    description: "Create a new order",
-    operationId: "post-orders",
+    summary: "Create transaction",
+    description: "Create a new transaction",
+    operationId: "post-transactions",
     tags: [],
     requestBody: {
       content: {
         "application/json": {
           schema: {
-            type: "object",
             properties: {
               userUuid: {
                 type: "string",
                 format: "uuid",
               },
+              amount: {
+                type: "integer",
+              },
             },
-            required: ["userUuid"],
+            required: ["userUuid", "amount"],
           },
         },
       },
     },
     responses: {
       200: {
-        description: "A order was created",
+        description: "A transaction was created",
         content: {
           "application/json": {
             schema: {},
@@ -70,13 +74,13 @@ module.exports = function (debug, orderService) {
   };
 
   list.apiDoc = {
-    summary: "Get all orders",
-    description: "Get all orders",
-    operationId: "get-orders",
+    summary: "Get all transactions",
+    description: "Get all transactions",
+    operationId: "get-transactions",
     tags: [],
     responses: {
       200: {
-        description: "A list of all orders",
+        description: "A list of all transactions",
         content: {
           "application/json": {
             schema: {},

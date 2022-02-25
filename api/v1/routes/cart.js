@@ -73,7 +73,7 @@ module.exports = function (debug, db, Prisma) {
                 properties: {
                   productUuid: {
                     type: "string",
-                    format: "uuid"
+                    format: "uuid",
                   },
                 },
                 required: ["productUuid"],

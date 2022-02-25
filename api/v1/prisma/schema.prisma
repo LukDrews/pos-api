@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -8,19 +9,21 @@ datasource db {
 }
 
 model User {
-  uuid      String   @id @unique @default(uuid())
-  firstName String
-  lastName  String
-  birthDate DateTime
-  role      Role     @relation(fields: [roleUuid], references: [uuid])
-  roleUuid  String
-  group     Group    @relation(fields: [groupUuid], references: [uuid])
-  groupUuid String
-  barcode   String?  @unique
-  orders    Order[]
-  imageUrl  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  uuid        String        @id @unique @default(uuid())
+  firstName   String
+  lastName    String
+  birthDate   DateTime
+  role        Role          @relation(fields: [roleUuid], references: [uuid])
+  roleUuid    String
+  group       Group         @relation(fields: [groupUuid], references: [uuid])
+  groupUuid   String
+  barcode     String?       @unique
+  orders      Order[]
+  imageUrl    String?
+  balance     Int           @default(0)
+  transactions Transaction[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model Group {
@@ -51,13 +54,14 @@ model Product {
 }
 
 model Order {
-  uuid      String      @id @unique() @default(uuid())
-  user      User        @relation(fields: [userUuid], references: [uuid])
-  userUuid  String
-  amount    Int?
-  items     OrderItem[]
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  uuid        String        @id @unique() @default(uuid())
+  user        User          @relation(fields: [userUuid], references: [uuid])
+  userUuid    String
+  amount      Int?
+  items       OrderItem[]
+  transactions Transaction[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model OrderItem {
@@ -79,4 +83,14 @@ model CartItem {
   count       Int      @default(1)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Transaction {
+  uuid      String   @id @unique() @default(uuid())
+  user      User?    @relation(fields: [userUuid], references: [uuid])
+  userUuid  String?
+  order     Order?   @relation(fields: [orderUuid], references: [uuid])
+  orderUuid String?
+  amount    Int
+  createdAt DateTime @default(now())
 }

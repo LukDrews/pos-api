@@ -1,16 +1,23 @@
+// Express related imports
 const express = require("express");
 const multer = require("multer");
 const logger = require("morgan");
 const cors = require("cors");
 const fs = require("fs");
 const { initialize } = require("express-openapi");
-const Dinero = require("dinero.js");
-const { PrismaClient, Prisma } = require("@prisma/client");
+const v1ApiDoc = require("./api/v1/api-doc");
 const customFormats = require("./libs/customFormats");
 
-const v1ApiDoc = require("./api/v1/api-doc");
-const debug = require("debug")("api");
-const errDebug = debug.extend("error");
+// Utility imorts
+const { PrismaClient, Prisma } = require("@prisma/client");
+const Dinero = require("dinero.js");
+const Services = require("./api/v1/services");
+const debug = require("debug"); 
+const apiDebug = debug("api");
+const errDebug = apiDebug.extend("error");
+
+const prisma = new PrismaClient();
+const services = Services.create(prisma, debug("service"));
 
 const app = express();
 const storage = multer.memoryStorage();
@@ -28,12 +35,12 @@ app.use(cors());
 app.use(logger("dev"));
 app.use(express.urlencoded({ extended: false }));
 
-const prisma = new PrismaClient();
+
 // create openapi-config
 initialize({
   app,
   apiDoc: { ...v1ApiDoc },
-  dependencies: { debug, db: prisma, Prisma, Dinero },
+  dependencies: { debug: apiDebug, db: prisma, ...services, Prisma, Dinero },
   paths: "./api/v1/routes",
   customFormats: customFormats,
   consumesMiddleware: {

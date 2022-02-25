@@ -66,7 +66,7 @@ module.exports = function (debug, db, Prisma) {
           barcode,
           imageUrl,
         },
-        include: { role: true, group: true, orders: true },
+        include: { role: true, group: true, orders: true, transactions: true },
       });
       return res.json(user);
     } catch (err) {
@@ -80,7 +80,7 @@ module.exports = function (debug, db, Prisma) {
     try {
       const user = await User.findUnique({
         where: { uuid },
-        include: { role: true, group: true, orders: true },
+        include: { role: true, group: true, orders: true, transactions: true  },
       });
       return res.json(user);
     } catch (err) {
