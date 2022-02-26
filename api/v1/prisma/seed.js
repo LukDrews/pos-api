@@ -3,29 +3,40 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Users
+  const startAmount = 1000;
   const users = [
     {
       firstName: "John",
       lastName: "Doe",
       birthDate: new Date("1990-12-24"),
       barcode: "90311031",
-      balance: 1000,
+      balance: startAmount,
+      transactions: {
+        create: [{ amount: startAmount }],
+      },
     },
     {
       firstName: "Max",
       lastName: "Musterman",
       birthDate: new Date("2000-01-31"),
       barcode: "90311017",
-      balance: 1000,
+      balance: startAmount,
+      transactions: {
+        create: [{ amount: startAmount }],
+      },
     },
     {
       firstName: "Test",
       lastName: "User",
       birthDate: new Date(),
       barcode: "90311048",
-      balance: 1000,
+      balance: startAmount,
+      transactions: {
+        create: [{ amount: startAmount }],
+      },
     },
   ];
+
   // Roles
   const roleNames = ["LaKi", "Teamer*in", "admin"];
   for (let name of roleNames) {
