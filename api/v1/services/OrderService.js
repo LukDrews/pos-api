@@ -1,5 +1,4 @@
 const Dinero = require("dinero.js");
-const { v4 } = require("uuid");
 
 module.exports = class OrderService {
   /**
@@ -21,10 +20,9 @@ module.exports = class OrderService {
    *     -> transaction starts here
    *     1. Check if items in cart
    *     2. Get total amount
-   *     3. Pre-compute order uuid
-   *     4. Create credit transaction
-   *     5. Create order
-   *     6. Delete cart items
+   *     3. Create credit transaction
+   *     4. Create order
+   *     5. Delete cart items
    *     -> transaction ends here
    *     Sources:
    *     https://www.prisma.io/docs/guides/performance-and-optimization/prisma-client-transactions-guide#scenario-pre-computed-ids-and-the-transaction-api
@@ -63,21 +61,16 @@ module.exports = class OrderService {
         });
       }
 
-      // // 3. Pre-compute order uuid
-      // const orderUuid = v4();
-      // this.logger(orderUuid);
-
-      // 4. Create credit transaction
+      // 3. Create credit transaction
       const transaction = await this.transactionService.createCreditTransaction(
         tx,
         -totalAmount, // negate amount because its a withdrawal
         userUuid,
       );
 
-      // 5. Create Order
+      // 4. Create Order
       const order = await tx.order.create({
         data: {
-          // uuid: orderUuid,
           user: {
             connect: {
               uuid: userUuid,
@@ -96,7 +89,7 @@ module.exports = class OrderService {
         include: { items: true },
       });
 
-      // 6. Delete cart items
+      // 5. Delete cart items
       await tx.cartItem.deleteMany({});
       return order;
     });

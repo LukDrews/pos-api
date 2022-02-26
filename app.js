@@ -27,7 +27,7 @@ app.use("/static", express.static("./uploads"));
 app.use("/static", express.static("./public"));
 fs.access("./uploads", (error) => {
   if (error) {
-    fs.mkdirSync("./uploads");
+    fs.mkdirSync("./uploads", { recursive: true });
   }
 });
 

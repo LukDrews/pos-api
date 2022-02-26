@@ -1,5 +1,6 @@
-const { ValidationError } = require("../utils/errors");
-module.exports = function (debug, db) {
+const { v4 } = require("uuid");
+
+module.exports = function (debug, db, imageService) {
   const logger = debug.extend("users");
   const User = db.user;
 
@@ -15,39 +16,31 @@ module.exports = function (debug, db) {
     const roleUuid = req.body.roleUuid;
     const groupUuid = req.body.groupUuid;
     const barcode = req.body.barcode;
-    const image = req.files[0];
+    const file = req.files[0];
+
+    let imageUrl;
 
     try {
-      let imageUrl = null;
-      if (image) {
-        const { buffer, originalname } = image;
-        const timestamp = new Date().toISOString();
-        const ref = `${timestamp}-${originalname}.webp`;
-        // await sharp(buffer)
-        //   .webp({ quality: 20 })
-        //   .toFile("./uploads/" + ref);
-        imageUrl = `http://localhost:3000/${ref}`;
-      }
-
-      const role = {
-        connect: {
-          uuid: roleUuid,
-        },
-      };
-
-      const group = {
-        connect: {
-          uuid: groupUuid,
-        },
-      };
+      const uuid = v4();
+      const filename = `${firstName}_${lastName}_${uuid}`;
+      imageUrl = await imageService.saveAsJPEG(file?.buffer, filename);
 
       const user = await User.create({
         data: {
+          uuid,
           firstName,
           lastName,
           birthDate,
-          role,
-          group,
+          role: {
+            connect: {
+              uuid: roleUuid,
+            },
+          },
+          group: {
+            connect: {
+              uuid: groupUuid,
+            },
+          },
           barcode,
           imageUrl,
         },
@@ -56,6 +49,10 @@ module.exports = function (debug, db) {
       return res.json(user);
     } catch (err) {
       logger(err);
+      // If user creation did not succeed, delete image
+      if (imageUrl) {
+        await imageService.deleteImage(imageUrl);
+      }
       return res.status(500).json();
     }
   }
