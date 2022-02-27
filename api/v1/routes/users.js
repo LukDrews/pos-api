@@ -1,4 +1,3 @@
-const { v4 } = require("uuid");
 
 module.exports = function (debug, db, imageService) {
   const logger = debug.extend("users");
@@ -18,16 +17,13 @@ module.exports = function (debug, db, imageService) {
     const barcode = req.body.barcode;
     const file = req.files[0];
 
-    let imageUrl;
+    let imagePath;
 
     try {
-      const uuid = v4();
-      const filename = `${firstName}_${lastName}_${uuid}`;
-      imageUrl = await imageService.saveAsJPEG(file?.buffer, filename);
+      imagePath = await imageService.saveAsJPEG(file?.buffer);
 
       const user = await User.create({
         data: {
-          uuid,
           firstName,
           lastName,
           birthDate,
@@ -42,7 +38,7 @@ module.exports = function (debug, db, imageService) {
             },
           },
           barcode,
-          imageUrl,
+          imagePath,
         },
         include: { role: true, group: true },
       });
@@ -50,8 +46,8 @@ module.exports = function (debug, db, imageService) {
     } catch (err) {
       logger(err);
       // If user creation did not succeed, delete image
-      if (imageUrl) {
-        await imageService.deleteImage(imageUrl);
+      if (imagePath) {
+        await imageService.deleteImage(imagePath);
       }
       return res.status(500).json();
     }

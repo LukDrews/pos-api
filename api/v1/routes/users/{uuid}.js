@@ -1,6 +1,5 @@
-module.exports = function (debug, db, Prisma) {
+module.exports = function (debug, db, Prisma, imageService) {
   const logger = debug.extend("users");
-  const User = db.user;
 
   const parameters = [
     {
@@ -26,36 +25,32 @@ module.exports = function (debug, db, Prisma) {
     const uuid = req.params.uuid;
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
-    const birthDate = new Date(req.body.birthDate).toISOString();
+    const birthDate = req.body?.birthDate
+      ? new Date(req.body.birthDate).toISOString()
+      : undefined;
     const roleUuid = req.body.roleUuid;
     const groupUuid = req.body.groupUuid;
     const barcode = req.body.barcode;
-    const image = req.files[0];
+    const file = req.files[0];
+
+    let imagePath;
 
     try {
-      let imageUrl = null;
-      if (image) {
-        const { buffer, originalname } = image;
-        const timestamp = new Date().toISOString();
-        const ref = `${timestamp}-${originalname}.webp`;
-        // await sharp(buffer)
-        //   .webp({ quality: 20 })
-        //   .toFile("./uploads/" + ref);
-        imageUrl = `http://localhost:3000/${ref}`;
+      // First get user to check for correct uuid
+      let user = await db.user.findUnique({ where: { uuid } });
+      if (!user) {
+        throw new Error("No user found.");
       }
 
-      const role = {
-        connect: {
-          uuid: roleUuid,
-        },
-      };
+      const oldImagePath = user.imagePath;
+      if (file) {
+        imagePath = await imageService.saveAsJPEG(file?.buffer);
+      }
 
-      const group = {
-        connect: {
-          uuid: groupUuid,
-        },
-      };
-      const user = await User.update({
+      const role = roleUuid ? { connect: { uuid: roleUuid } } : undefined;
+      const group = groupUuid ? { connect: { uuid: groupUuid } } : undefined;
+
+      user = await db.user.update({
         where: { uuid },
         data: {
           firstName,
@@ -64,13 +59,31 @@ module.exports = function (debug, db, Prisma) {
           role,
           group,
           barcode,
-          imageUrl,
+          imagePath,
         },
-        include: { role: true, group: true, orders: true, transactions: true },
+        include: {
+          role: true,
+          group: true,
+          orders: true,
+          transactions: true,
+        },
       });
+
+      // Remove old image
+      if (imagePath != oldImagePath) {
+        try {
+          await imageService.deleteImage(oldImagePath);
+        } catch (error) {
+          logger(error);
+        }
+      }
+
       return res.json(user);
     } catch (err) {
       logger(err);
+      if (imagePath) {
+        await imageService.deleteImage(imagePath);
+      }
       return res.status(500).json();
     }
   }
@@ -78,9 +91,9 @@ module.exports = function (debug, db, Prisma) {
   async function read(req, res, next) {
     const uuid = req.params.uuid;
     try {
-      const user = await User.findUnique({
+      const user = await db.user.findUnique({
         where: { uuid },
-        include: { role: true, group: true, orders: true, transactions: true  },
+        include: { role: true, group: true, orders: true, transactions: true },
       });
       return res.json(user);
     } catch (err) {
@@ -92,9 +105,11 @@ module.exports = function (debug, db, Prisma) {
   async function del(req, res, next) {
     const uuid = req.params.uuid;
     try {
-      const user = await User.delete({
+      const user = await db.user.delete({
         where: { uuid },
       });
+      await imageService.deleteImage(user.imagePath);
+
       return res.json(user);
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {

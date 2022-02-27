@@ -19,7 +19,7 @@ model User {
   groupUuid    String
   barcode      String?       @unique
   orders       Order[]
-  imageUrl     String?
+  imagePath    String?
   balance      Int           @default(0)
   transactions Transaction[]
   createdAt    DateTime      @default(now())

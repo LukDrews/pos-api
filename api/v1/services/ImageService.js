@@ -2,15 +2,19 @@ const fs = require("fs/promises");
 const { ImagePool } = require("@squoosh/lib");
 const path = require("path");
 
+const FILE_EXTENSION = ".jpg"
+
 module.exports = class ImageService {
   constructor(debug) {
     this.logger = debug.extend("images");
   }
 
-  async saveAsJPEG(buffer, filename) {
-    if (!buffer || !filename) {
+  async saveAsJPEG(buffer) {
+    if (!buffer) {
       return null;
     }
+
+    const filename = Math.floor(Date.now() / 1000)
 
     const imagePool = new ImagePool();
     try {
@@ -29,9 +33,8 @@ module.exports = class ImageService {
       await image.encode(encodeOptions);
       const encodedImage = await image.encodedWith.mozjpeg;
 
-      const ref = `${filename}.${encodedImage.extension}`;
-      await fs.writeFile(this.getUploadPath(ref), encodedImage.binary);
-      return this.createImageUrl(ref);
+      await fs.writeFile(this.getUploadPath(filename), encodedImage.binary);
+      return this.getImagePath(filename);
     } catch (error) {
       this.logger(error);
       throw error;
@@ -41,15 +44,23 @@ module.exports = class ImageService {
   }
 
   getUploadPath(filename) {
-    return path.join("./uploads/", filename); // TODO get upload path from config
+    return path.format({
+      dir: "./uploads", // TODO get upload path from config
+      name: filename,
+      ext: FILE_EXTENSION
+    })
   }
 
-  createImageUrl(ref) {
-    return `/static/${ref}`; // TODO get base path from config
+  getImagePath(filename) {
+    return path.format({
+      dir: "/static", // TODO get base path from config
+      name: filename,
+      ext: FILE_EXTENSION
+    })
   }
 
-  async deleteImage(imageUrl) {
-    const ref = path.basename(imageUrl);
+  async deleteImage(imagePath) {
+    const ref = path.parse(imagePath).name;
     await fs.rm(this.getUploadPath(ref));
   }
 };
