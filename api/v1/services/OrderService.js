@@ -86,7 +86,7 @@ module.exports = class OrderService {
             },
           },
         },
-        include: { items: true },
+        include: { items: true, user: true },
       });
 
       // 5. Delete cart items
