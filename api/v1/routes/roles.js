@@ -23,7 +23,11 @@ module.exports = function (debug, db) {
     try {
       const roles = await Role.findMany({
         include: {
-          users: true,
+          users: {
+            select: {
+              uuid: true,
+            },
+          },
         },
       });
       return res.json(roles);

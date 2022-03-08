@@ -1,7 +1,5 @@
-
-module.exports = function (debug, db, imageService) {
+module.exports = function (debug, userService) {
   const logger = debug.extend("users");
-  const User = db.user;
 
   let operations = {
     POST: create,
@@ -9,55 +7,31 @@ module.exports = function (debug, db, imageService) {
   };
 
   async function create(req, res, next) {
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
+    const { firstName, lastName, roleUuid, groupUuid, barcode } = req.body;
+
     const birthDate = new Date(req.body.birthDate).toISOString();
-    const roleUuid = req.body.roleUuid;
-    const groupUuid = req.body.groupUuid;
-    const barcode = req.body.barcode;
     const file = req.files[0];
 
-    let imagePath;
-
     try {
-      imagePath = await imageService.saveAsJPEG(file?.buffer);
-
-      const user = await User.create({
-        data: {
-          firstName,
-          lastName,
-          birthDate,
-          role: {
-            connect: {
-              uuid: roleUuid,
-            },
-          },
-          group: {
-            connect: {
-              uuid: groupUuid,
-            },
-          },
-          barcode,
-          imagePath,
-        },
-        include: { role: true, group: true },
-      });
+      const user = await userService.create(
+        firstName,
+        lastName,
+        birthDate,
+        roleUuid,
+        groupUuid,
+        barcode,
+        file
+      );
       return res.json(user);
     } catch (err) {
       logger(err);
-      // If user creation did not succeed, delete image
-      if (imagePath) {
-        await imageService.deleteImage(imagePath);
-      }
       return res.status(500).json();
     }
   }
 
   async function list(req, res, next) {
     try {
-      const users = await User.findMany({
-        include: { group: true, role: true },
-      });
+      const users = await userService.getAll();
       return res.json(users);
     } catch (err) {
       logger(err);

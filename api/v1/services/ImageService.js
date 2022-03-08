@@ -2,7 +2,7 @@ const fs = require("fs/promises");
 const { ImagePool } = require("@squoosh/lib");
 const path = require("path");
 
-const FILE_EXTENSION = ".jpg"
+const FILE_EXTENSION = ".jpg";
 
 module.exports = class ImageService {
   constructor(debug) {
@@ -14,7 +14,7 @@ module.exports = class ImageService {
       return null;
     }
 
-    const filename = Math.floor(Date.now() / 1000)
+    const filename = Math.floor(Date.now() / 1000);
 
     const imagePool = new ImagePool();
     try {
@@ -47,19 +47,20 @@ module.exports = class ImageService {
     return path.format({
       dir: "./uploads", // TODO get upload path from config
       name: filename,
-      ext: FILE_EXTENSION
-    })
+      ext: FILE_EXTENSION,
+    });
   }
 
   getImagePath(filename) {
     return path.format({
       dir: "/static", // TODO get base path from config
       name: filename,
-      ext: FILE_EXTENSION
-    })
+      ext: FILE_EXTENSION,
+    });
   }
 
   async deleteImage(imagePath) {
+    if (imagePath == null) return;
     const ref = path.parse(imagePath).name;
     await fs.rm(this.getUploadPath(ref));
   }
