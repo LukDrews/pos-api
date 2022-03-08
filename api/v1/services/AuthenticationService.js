@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
-const { header } = require("express/lib/request");
 const jwt = require("jsonwebtoken");
+
+const ACCESS_TOKEN_SECRET = "my secret token"; // TODO create secret in convict config
 
 module.exports = class AuthenticationService {
   /**
@@ -26,31 +27,33 @@ module.exports = class AuthenticationService {
 
     const accessToken = jwt.sign(
       { uuid: userLogin.userUuid },
-      "my secret token" // TODO use proper secret
+      ACCESS_TOKEN_SECRET
     );
     return accessToken;
   }
 
   validateToken() {
-    const db = this.db
-    const logger = this.logger
+    const db = this.db;
+    const logger = this.logger;
     return async (req, res, next) => {
       const authHeader = req?.headers?.authorization;
-      if (authHeader) {
-        const token = authHeader?.split(" ")?.[1];
-        if (token == null) return res.status(401).send("No token found");
-        
-        try {
-          const { uuid } = jwt.verify(token, "my secret token");
-          // attach user to request
-          req.user = await db.user.findUnique({ where: { uuid } });
-        } catch (error) {
-          logger(error)
-          return res.status(403).send("Token invalid");
-        }
+      if (!authHeader) return next(); // continue with no user
+
+      const token = authHeader?.split(" ")?.[1];
+      if (token == null) return res.status(401).send("No token found");
+
+      try {
+        const { uuid } = jwt.verify(token, ACCESS_TOKEN_SECRET);
+        if (!uuid) throw new Error();
+
+        // inject user into request
+        req.user = await db.user.findUnique({ where: { uuid } });
+        next();
+      } catch (error) {
+        logger(error);
+        return res.status(403).send("Token invalid");
       }
-      next();
-    }
+    };
   }
 
   static async hashPassword(password) {

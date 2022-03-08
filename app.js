@@ -12,7 +12,7 @@ const customFormats = require("./libs/customFormats");
 const { PrismaClient, Prisma } = require("@prisma/client");
 const Dinero = require("dinero.js");
 const Services = require("./api/v1/services");
-const debug = require("debug"); 
+const debug = require("debug");
 const apiDebug = debug("api");
 const errDebug = apiDebug.extend("error");
 
@@ -34,7 +34,7 @@ fs.access("./uploads", (error) => {
 app.use(cors());
 app.use(logger("dev"));
 app.use(express.urlencoded({ extended: false }));
-
+app.use(services.authenticationService.validateToken());
 
 // create openapi-config
 initialize({
@@ -47,14 +47,10 @@ initialize({
     "application/json": express.json(),
     "multipart/form-data": function (req, res, next) {
       upload.any()(req, res, function (err) {
-        if (err) {
-          return next(err);
-        }
-        // Handle both single and multiple files
-        if (req.files.length === 0) {
-          // early exit
-          return next();
-        }
+        if (err) return next(err);
+        if (req.files.length === 0) return next();
+
+        // Merge multiple files into one field as an array
         const filesMap = req.files.reduce(
           (acc, f) =>
             Object.assign(acc, {
