@@ -24,6 +24,7 @@ model User {
   transactions Transaction[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  login        UserLogin?
 }
 
 model Group {
@@ -93,4 +94,13 @@ model Transaction {
   order     Order?
   amount    Int
   createdAt DateTime @default(now())
+}
+
+model UserLogin {
+  userUuid  String   @id @unique()
+  user      User     @relation(fields: [userUuid], references: [uuid])
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

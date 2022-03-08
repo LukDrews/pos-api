@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const authenticationService = require("../services/AuthenticationService");
 
 async function main() {
   // Users
@@ -13,6 +14,12 @@ async function main() {
       balance: startAmount,
       transactions: {
         create: [{ amount: startAmount }],
+      },
+      login: {
+        create: {
+          username: "test",
+          password: await authenticationService.hashPassword("1234"),
+        },
       },
     },
     {

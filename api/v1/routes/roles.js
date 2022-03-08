@@ -1,10 +1,13 @@
-module.exports = function (debug, db) {
+module.exports = function (debug, db, authenticationService) {
   const logger = debug.extend("roles");
   const Role = db.role;
 
   let operations = {
     POST: create,
-    GET: list,
+    GET: [
+      authenticationService.validateToken(),
+      list,
+    ],
   };
 
   async function create(req, res, next) {
