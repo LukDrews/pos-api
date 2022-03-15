@@ -1,4 +1,8 @@
 module.exports = class UserService {
+  /**
+   * @param {import("@prisma/client").PrismaClient} db
+   * @param {import("debug").Debugger} debug
+   */
   constructor(db, debug, imageService) {
     this.db = db;
     this.logger = debug.extend("users");
@@ -149,18 +153,40 @@ module.exports = class UserService {
 
   async delete(uuid) {
     try {
-      // FIXME this should be done with a transaction
-      const balance = (await this.db.user.findUnique({ where: { uuid } })).balance;
+      return await this.db.$transaction(async (tx) => {
+        // FIXME this should be done with a transaction
+        const user = await tx.user.findUnique({
+          where: { uuid },
+          include: {
+            orders: { include: { items: true } },
+            transactions: true,
+            login: { select: { username: true } },
+          },
+        });
 
-      if (balance !== 0)
-        throw Error("Account can't be deleted. Cause: account balance not 0.");
+        if (user.balance !== 0)
+          throw Error(
+            "Account can't be deleted. Cause: account balance not 0."
+          );
 
-      const user = await this.db.user.delete({
-        where: { uuid },
+        for (const order of user.orders) {
+          await tx.orderItem.deleteMany({ where: { orderUuid: order.uuid } });
+          await tx.order.delete({ where: { uuid: order.uuid } });
+        }
+
+        await tx.transaction.deleteMany({ where: { userUuid: user.uuid } });
+
+        if (user.login) {
+          await tx.userLogin.delete({ where: { userUuid: user.uuid } });
+        }
+
+        await tx.user.delete({
+          where: { uuid },
+        });
+        await this.imageService.deleteImage(user.imagePath);
+
+        return user;
       });
-      await this.imageService.deleteImage(user.imagePath);
-
-      return user;
     } catch (err) {
       this.logger(err);
       throw err;
