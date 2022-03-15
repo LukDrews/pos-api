@@ -120,27 +120,13 @@ module.exports = class UserService {
   }
 
   async getAll() {
-    const users = await this.db.user.findMany({
-      include: {
-        group: {
-          select: {
-            uuid: true,
-          },
-        },
-        role: {
-          select: {
-            uuid: true,
-          },
-        },
-      },
-    });
+    const users = await this.db.user.findMany();
     return users;
   }
 
   async getByUuid(uuid) {
     const user = await this.db.user.findUnique({
       where: { uuid },
-      include: { role: true, group: true, orders: true, transactions: true },
     });
     return user;
   }

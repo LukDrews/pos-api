@@ -21,7 +21,7 @@ module.exports = function (debug, db) {
 
   async function list(req, res, next) {
     try {
-      const groups = await Group.findMany({ include: { users: true } });
+      const groups = await Group.findMany();
       return res.json(groups);
     } catch (err) {
       logger(err);

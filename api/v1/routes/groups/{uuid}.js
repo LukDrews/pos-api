@@ -43,7 +43,7 @@ module.exports = function (debug, db, Prisma) {
       const group = await Group.findUnique({
         where: { uuid },
         include: {
-          users: true,
+          users: {select: { uuid: true}},
         },
       });
       return res.json(group);
