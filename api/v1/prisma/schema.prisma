@@ -89,8 +89,8 @@ model CartItem {
 
 model Transaction {
   uuid      String   @id @unique() @default(uuid())
-  user      User?    @relation(fields: [userUuid], references: [uuid])
-  userUuid  String?
+  user      User     @relation(fields: [userUuid], references: [uuid])
+  userUuid  String
   order     Order?
   amount    Int
   createdAt DateTime @default(now())
