@@ -20,7 +20,7 @@ const productBarcode = (input) => {
 };
 
 const userBarcode = (input) => {
-  return ean8 && hasCustomerPrefix(input);
+  return hasCustomerPrefix(input) && ean8(input);
 };
 
 /**

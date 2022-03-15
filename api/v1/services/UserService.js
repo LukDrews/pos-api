@@ -141,15 +141,20 @@ module.exports = class UserService {
     return user;
   }
 
-  async getByBarcode(barcode){
+  async getByBarcode(barcode) {
     const user = await this.db.user.findUnique({
-        where: { barcode },
-      });
+      where: { barcode },
+    });
   }
 
   async delete(uuid) {
     try {
       // FIXME this should be done with a transaction
+      const balance = (await this.db.user.findUnique({ where: { uuid } })).balance;
+
+      if (balance !== 0)
+        throw Error("Account can't be deleted. Cause: account balance not 0.");
+
       const user = await this.db.user.delete({
         where: { uuid },
       });

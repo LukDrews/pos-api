@@ -10,7 +10,7 @@ async function main() {
       firstName: "John",
       lastName: "Doe",
       birthDate: new Date("1990-12-24"),
-      barcode: "90311031",
+      barcode: "95211039",
       balance: startAmount,
       transactions: {
         create: [{ amount: startAmount }],
@@ -26,7 +26,7 @@ async function main() {
       firstName: "Max",
       lastName: "Musterman",
       birthDate: new Date("2000-01-31"),
-      barcode: "90311017",
+      barcode: "95211015",
       balance: startAmount,
       transactions: {
         create: [{ amount: startAmount }],
@@ -36,7 +36,7 @@ async function main() {
       firstName: "Test",
       lastName: "User",
       birthDate: new Date(),
-      barcode: "90311048",
+      barcode: "95211046",
       balance: startAmount,
       transactions: {
         create: [{ amount: startAmount }],
