@@ -6,7 +6,8 @@
     "start": "node ./bin/dev",
     "dev": "DEBUG=*,-prisma:*,-express:router* nodemon ./bin/dev --ignore ./api/v1/prisma/db --ignore ./uploads --inspect",
     "migrate": "npx prisma migrate dev",
-    "build": "npx prisma migrate deploy && npx prisma generate && npx prisma db seed"
+    "build": "npx prisma migrate deploy && npx prisma generate && npx prisma db seed",
+    "studio": "npx prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^3.8.1",

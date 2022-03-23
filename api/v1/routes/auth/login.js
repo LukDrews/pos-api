@@ -12,7 +12,7 @@ module.exports = function (debug, authenticationService) {
       return res.json({ accessToken });
     } catch (error) {
       logger(error);
-      return res.sendStatus(500);
+      return res.sendStatus(401);
     }
   }
 
