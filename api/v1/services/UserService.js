@@ -1,3 +1,6 @@
+const { barcode } = require("../../../libs/validators");
+const BARCODE_PREFIX = "952";
+
 module.exports = class UserService {
   /**
    * @param {import("@prisma/client").PrismaClient} db
@@ -16,11 +19,15 @@ module.exports = class UserService {
     roleUuid,
     groupUuid,
     barcode = undefined,
+    generateBarcode = undefined,
     file = undefined
   ) {
     let imagePath;
-
     try {
+      if (generateBarcode && barcode == null) {
+        barcode = await this.generateUserBarcode();
+      }
+
       imagePath = await this.imageService.saveAsJPEG(file?.buffer);
 
       const user = await this.db.user.create({
@@ -45,13 +52,31 @@ module.exports = class UserService {
       });
       return user;
     } catch (err) {
-      logger(err);
+      this.logger(err);
       // If user creation did not succeed, delete image
       if (imagePath) {
         await this.imageService.deleteImage(imagePath);
       }
       throw err;
     }
+  }
+
+  async generateUserBarcode() {
+    const user = await this.db.user.findFirst({
+      orderBy: {
+        barcode: "desc",
+      },
+      select: { barcode: true },
+    });
+
+    let index = 0;
+    if (user?.barcode) {
+      const substring = user.barcode.substring(3, 7);
+      index = Number.parseInt(substring) + 1;
+    }
+    let userBarcode = BARCODE_PREFIX + index.toString().padStart(4, "0");
+    userBarcode += barcode.getChecksum(userBarcode + "0");
+    return userBarcode;
   }
 
   async update(
@@ -62,6 +87,7 @@ module.exports = class UserService {
     roleUuid,
     groupUuid,
     barcode = undefined,
+    generateBarcode = undefined,
     file = undefined
   ) {
     let imagePath;
@@ -71,6 +97,10 @@ module.exports = class UserService {
       let user = await this.db.user.findUnique({ where: { uuid } });
       if (!user) {
         throw new Error("No user found.");
+      }
+
+      if (generateBarcode && barcode == null) {
+        barcode = await this.generateUserBarcode();
       }
 
       const oldImagePath = user.imagePath;

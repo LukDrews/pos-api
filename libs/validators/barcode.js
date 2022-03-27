@@ -6,18 +6,25 @@ const formats = {
   ean18: { validChars: /^\d{18}$/, validLength: 18 },
 };
 
-function calculateChecksum(barcode) {
+function sumArray(array) {
+  return array
+    .map((d, i) => (i % 2 === 0 ? Number(d) * 3 : Number(d)))
+    .reduce((acc, d) => acc + d);
+}
+function calcChecksum(sum) {
+  return (10 - (sum % 10)) % 10;
+}
+
+function getChecksum(barcode, verify = true) {
   const arr = barcode
     .substring(0, barcode.length - 1)
     .split("")
     .reverse();
 
-  const sum = arr
-    .map((d, i) => (i % 2 === 0 ? Number(d) * 3 : Number(d)))
-    .reduce((acc, d) => acc + d);
+  const sum = sumArray(arr);
 
-  const checkSum = (10 - (sum % 10)) % 10;
-  return checkSum;
+  const checksum = calcChecksum(sum);
+  return checksum;
 }
 
 function validateFormat(barcode, format) {
@@ -28,7 +35,7 @@ function validateFormat(barcode, format) {
 
 function validateBarcode(barcode) {
   const lastDigit = Number(barcode.substring(barcode.length - 1));
-  const checkSum = calculateChecksum(barcode);
+  const checkSum = getChecksum(barcode);
   return checkSum === lastDigit;
 }
 
@@ -56,4 +63,5 @@ module.exports = {
       false;
     }
   },
+  getChecksum,
 };

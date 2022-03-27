@@ -27,6 +27,7 @@ module.exports = function (debug, db, Prisma, userService, imageService) {
     const { firstName, lastName, birthDate, roleUuid, groupUuid, barcode } =
       req.body;
     const file = req.files[0];
+    const generateBarcode = req.body.generateBarcode === "true" 
 
     try {
       const user = await userService.update(
@@ -37,6 +38,7 @@ module.exports = function (debug, db, Prisma, userService, imageService) {
         roleUuid,
         groupUuid,
         barcode,
+        generateBarcode,
         file
       );
       return res.json(user);

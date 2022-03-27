@@ -93,6 +93,11 @@ const apiDoc = {
             type: "string",
             format: "userBarcode",
           },
+          generateBarcode: {
+            type: "string",
+            enum: ["true", "false"],
+            default: "true",
+          },
           image: {
             type: "string",
             format: "binary",

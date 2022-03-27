@@ -7,8 +7,15 @@ module.exports = function (debug, userService) {
   };
 
   async function create(req, res, next) {
-    const { firstName, lastName, roleUuid, groupUuid, barcode } = req.body;
+    const {
+      firstName,
+      lastName,
+      roleUuid,
+      groupUuid,
+      barcode,
+    } = req.body;
 
+    const generateBarcode = req.body.generateBarcode === "true" 
     const birthDate = new Date(req.body.birthDate).toISOString();
     const file = req.files[0];
 
@@ -20,6 +27,7 @@ module.exports = function (debug, userService) {
         roleUuid,
         groupUuid,
         barcode,
+        generateBarcode,
         file
       );
       return res.json(user);

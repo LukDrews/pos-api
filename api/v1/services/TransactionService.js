@@ -53,7 +53,6 @@ module.exports = class TransactionService {
       );
     }
 
-
     // 3. Create Credit transaction
     const transaction = await tx.transaction.create({
       data: {
@@ -64,6 +63,7 @@ module.exports = class TransactionService {
           },
         },
       },
+      include: { user: true },
     });
     return transaction;
   }
