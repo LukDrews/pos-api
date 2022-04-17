@@ -30,21 +30,16 @@ module.exports = class UserService {
 
       imagePath = await this.imageService.saveAsJPEG(file?.buffer);
 
+      const role = roleUuid ? { connect: { uuid: roleUuid } } : undefined;
+      const group = groupUuid ? { connect: { uuid: groupUuid } } : undefined;
+
       const user = await this.db.user.create({
         data: {
           firstName,
           lastName,
           birthDate,
-          role: {
-            connect: {
-              uuid: roleUuid,
-            },
-          },
-          group: {
-            connect: {
-              uuid: groupUuid,
-            },
-          },
+          role,
+          group,
           barcode,
           imagePath,
         },

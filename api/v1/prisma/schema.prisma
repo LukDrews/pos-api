@@ -13,10 +13,10 @@ model User {
   firstName    String
   lastName     String
   birthDate    DateTime
-  role         Role          @relation(fields: [roleUuid], references: [uuid])
-  roleUuid     String
-  group        Group         @relation(fields: [groupUuid], references: [uuid])
-  groupUuid    String
+  role         Role?         @relation(fields: [roleUuid], references: [uuid])
+  roleUuid     String?
+  group        Group?        @relation(fields: [groupUuid], references: [uuid])
+  groupUuid    String?
   barcode      String?       @unique
   orders       Order[]
   imagePath    String?
