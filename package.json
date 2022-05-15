@@ -1,13 +1,30 @@
 {
   "name": "pos-api",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
+  "main": "electron/main.js",
   "scripts": {
     "start": "node ./bin/dev",
     "dev": "DEBUG=*,-prisma:*,-express:router* nodemon ./bin/dev --ignore ./api/v1/prisma/db --ignore ./uploads --inspect",
     "migrate": "npx prisma migrate dev",
-    "build": "npx prisma migrate deploy && npx prisma generate && npx prisma db seed",
-    "studio": "npx prisma studio"
+    "build-prisma": "npx prisma migrate deploy && npx prisma generate && npx prisma db seed",
+    "studio": "npx prisma studio",
+    "dev-electron": "node scripts/dev-server.js",
+    "x-prebuild": "node scripts/build-vue.js",
+    "build": "electron-builder -c config/electron-builder.json",
+    "build:win": "node scripts/build-vue.js && electron-builder -c config/electron-builder.json --win",
+    "build:mac": "node scripts/build-vue.js && electron-builder -c config/electron-builder.json --mac",
+    "build:linux": "node scripts/build-vue.js && electron-builder -c config/electron-builder.json --linux"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.3",
+    "chalk": "^4.1.2",
+    "chokidar": "^3.5.3",
+    "electron": "^18.2.3",
+    "electron-builder": "^23.0.3",
+    "nodemon": "^2.0.15",
+    "prisma": "^3.8.1",
+    "vite": "^2.9.9"
   },
   "dependencies": {
     "@prisma/client": "^3.8.1",
@@ -25,10 +42,6 @@
     "multer": "^1.4.4",
     "sqlite3": "^5.0.2",
     "xlsx": "^0.18.5"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.15",
-    "prisma": "^3.8.1"
   },
   "prisma": {
     "schema": "api/v1/prisma/schema.prisma",

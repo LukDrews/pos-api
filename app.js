@@ -1,15 +1,17 @@
 // Express related imports
+process.env.DEBUG="*"
 const express = require("express");
 const multer = require("multer");
 const logger = require("morgan");
 const cors = require("cors");
 const fs = require("fs");
+const path = require('path');
 const { initialize } = require("express-openapi");
 const v1ApiDoc = require("./api/v1/api-doc");
 const customFormats = require("./libs/customFormats");
 
 // Utility imorts
-const { PrismaClient, Prisma } = require("@prisma/client");
+const { PrismaClient, Prisma } = require("./libs/generated/client");
 const Dinero = require("dinero.js");
 const Services = require("./api/v1/services");
 const debug = require("debug");
@@ -23,25 +25,25 @@ const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-app.use("/static", express.static("./uploads"));
-app.use("/static", express.static("./public"));
-fs.access("./uploads", (error) => {
-  if (error) {
-    fs.mkdirSync("./uploads", { recursive: true });
-  }
-});
+// app.use("/static", express.static("./public"));
+// app.use("/static", express.static("./uploads"));
+// fs.access("./uploads", (error) => {
+//   if (error) {
+//     fs.mkdirSync("./uploads", { recursive: true });
+//   }
+// });
 
 app.use(cors());
 app.use(logger("dev"));
 app.use(express.urlencoded({ extended: false }));
-app.use(services.authenticationService.validateToken());
+// app.use(services.authenticationService.validateToken());
 
 // create openapi-config
 initialize({
   app,
   apiDoc: { ...v1ApiDoc },
   dependencies: { debug: apiDebug, db: prisma, ...services, Prisma, Dinero },
-  paths: "./api/v1/routes",
+  paths: path.join(__dirname, "./api/v1/routes"),
   customFormats: customFormats,
   consumesMiddleware: {
     "application/json": express.json(),
