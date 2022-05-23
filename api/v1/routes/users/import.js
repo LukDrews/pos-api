@@ -1,6 +1,12 @@
 const XLSX = require("xlsx");
 const moment = require("moment");
 
+/**
+ * 
+ * @param {*} debug 
+ * @param {import("../services/UserService")} userService 
+ * @returns 
+ */
 module.exports = function (debug, userService) {
   const logger = debug.extend("users");
 

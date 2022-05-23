@@ -12,6 +12,18 @@ module.exports = class UserService {
     this.imageService = imageService;
   }
 
+  /**
+   * 
+   * @param {*} firstName 
+   * @param {*} lastName 
+   * @param {*} birthDate 
+   * @param {*} roleUuid 
+   * @param {*} groupUuid 
+   * @param {*} barcode 
+   * @param {*} generateBarcode 
+   * @param {*} file 
+   * @returns 
+   */
   async create(
     firstName,
     lastName,
