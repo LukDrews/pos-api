@@ -1,11 +1,12 @@
-const XLSX = require("xlsx");
+// const XLSX = require("xlsx");
 const moment = require("moment");
+const { parse } = require("csv-parse/sync");
 
 /**
- * 
- * @param {*} debug 
- * @param {import("../services/UserService")} userService 
- * @returns 
+ *
+ * @param {*} debug
+ * @param {import("../services/UserService")} userService
+ * @returns
  */
 module.exports = function (debug, userService) {
   const logger = debug.extend("users");
@@ -18,18 +19,19 @@ module.exports = function (debug, userService) {
     const file = req.files[0];
 
     try {
-      const workbook = XLSX.read(file.buffer);
-      const excelUsers = XLSX.utils.sheet_to_json(workbook.Sheets["Sheet1"]);
+      const csvUsers = parse(file.buffer, {
+        columns: true,
+        skip_empty_lines: true,
+        delimiter: ";",
+        cast: castDate,
+      });
+
       const users = [];
-      for (const user of excelUsers) {
-        const birthDate = moment(user.birthdate, [
-          "DD.MM.YYYY",
-          "DD-MM-YYYY",
-        ]).toISOString();
+      for (const user of csvUsers) {
         const result = await userService.create(
           user.firstname,
           user.lastname,
-          birthDate,
+          user.birthdate,
           undefined,
           undefined,
           undefined,
@@ -38,11 +40,48 @@ module.exports = function (debug, userService) {
         users.push(result);
       }
       return res.json(users);
-    } catch (err) {
+    } catch (error) {
       logger(err);
       return res.status(500).json();
     }
   }
+
+  function castDate(value, context) {
+    if (!context.header && context.column === "birthdate") {
+      return moment(value, ["DD.MM.YYYY", "DD-MM-YYYY"]).toISOString();
+    }
+    return value;
+  }
+
+  // async function importUsersXlsx(req, res, next) {
+  //   const file = req.files[0];
+
+  //   try {
+  //     const workbook = XLSX.read(file.buffer);
+  //     const excelUsers = XLSX.utils.sheet_to_json(workbook.Sheets["Sheet1"]); // TODO try to import all workbook
+  //     const users = [];
+  //     for (const user of excelUsers) {
+  //       const birthDate = moment(user.birthdate, [
+  //         "DD.MM.YYYY",
+  //         "DD-MM-YYYY",
+  //       ]).toISOString();
+  //       const result = await userService.create(
+  //         user.firstname,
+  //         user.lastname,
+  //         birthDate,
+  //         undefined,
+  //         undefined,
+  //         undefined,
+  //         true
+  //       );
+  //       users.push(result);
+  //     }
+  //     return res.json(users);
+  //   } catch (err) {
+  //     logger(err);
+  //     return res.status(500).json();
+  //   }
+  // }
 
   importUsers.apiDoc = {
     summary: "Import users",
