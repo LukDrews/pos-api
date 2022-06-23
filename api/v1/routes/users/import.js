@@ -1,14 +1,16 @@
 // const XLSX = require("xlsx");
 const moment = require("moment");
 const { parse } = require("csv-parse/sync");
+const GroupService = require("../../services/GroupService");
 
 /**
  *
  * @param {*} debug
- * @param {import("../services/UserService")} userService
+ * @param {import("../../services/UserService")} userService
+ * @param {import("../../services/GroupService")} groupService
  * @returns
  */
-module.exports = function (debug, userService) {
+module.exports = function (debug, userService, groupService) {
   const logger = debug.extend("users");
 
   let operations = {
@@ -28,20 +30,32 @@ module.exports = function (debug, userService) {
 
       const users = [];
       for (const user of csvUsers) {
+
+        // Check if group exsists
+        let group;
+        if (user.group != null) {
+          group = await groupService.getByName(user.group);
+          if (group == null) {
+            group = await groupService.create(user.group);
+          }
+        }
+
+        const barcode = user.barcode || undefined;
+        const generateBarcode = barcode == null;
         const result = await userService.create(
           user.firstname,
           user.lastname,
           user.birthdate,
           undefined,
-          undefined,
-          undefined,
-          true
+          group.uuid,
+          barcode,
+          generateBarcode
         );
         users.push(result);
       }
       return res.json(users);
     } catch (error) {
-      logger(err);
+      logger(error);
       return res.status(500).json();
     }
   }
