@@ -27,7 +27,7 @@ const userBarcode = (input) => {
  * helper functions
  */
 const hasCustomerPrefix = (input) => {
-  const customerPrefix = "952";
+  const customerPrefix = "957";
   return input.startsWith(customerPrefix);
 };
 

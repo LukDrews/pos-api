@@ -1,5 +1,5 @@
 const { barcode } = require("../../../libs/validators");
-const BARCODE_PREFIX = "952";
+const BARCODE_PREFIX = "957";
 
 module.exports = class UserService {
   /**
