@@ -1,7 +1,6 @@
 // const XLSX = require("xlsx");
 const moment = require("moment");
 const { parse } = require("csv-parse/sync");
-const GroupService = require("../../services/GroupService");
 
 /**
  *
@@ -10,7 +9,7 @@ const GroupService = require("../../services/GroupService");
  * @param {import("../../services/GroupService")} groupService
  * @returns
  */
-module.exports = function (debug, userService, groupService) {
+module.exports = function (debug, userService, groupService, transactionService) {
   const logger = debug.extend("users");
 
   let operations = {
@@ -52,6 +51,17 @@ module.exports = function (debug, userService, groupService) {
           generateBarcode
         );
         users.push(result);
+
+        // Check if we also have to add money to the account#
+        try {
+          const amount = Number.parseInt(user.amount * 100);
+          if ( amount > 0 ) {
+            await transactionService.create(amount, result.uuid);
+          }
+        } catch (error) {
+          console.log("Tried to convert: " + amount)
+          console.log(error);
+        }
       }
       return res.json(users);
     } catch (error) {
