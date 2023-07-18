@@ -115,8 +115,8 @@ module.exports = class UserService {
         imagePath = await this.imageService.saveAsJPEG(file?.buffer);
       }
 
-      const role = roleUuid ? { connect: { uuid: roleUuid } } : undefined;
-      const group = groupUuid ? { connect: { uuid: groupUuid } } : undefined;
+      const role = roleUuid !== "null" ? { connect: { uuid: roleUuid } } : undefined;
+      const group = groupUuid !== "null" ? { connect: { uuid: groupUuid } } : undefined;
 
       user = await this.db.user.update({
         where: { uuid },

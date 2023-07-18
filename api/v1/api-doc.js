@@ -83,7 +83,6 @@ const apiDoc = {
           },
           roleUuid: {
             type: "string",
-            format: "uuid",
           },
           groupUuid: {
             type: "string",
