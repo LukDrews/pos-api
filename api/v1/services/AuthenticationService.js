@@ -27,7 +27,10 @@ module.exports = class AuthenticationService {
 
     const accessToken = jwt.sign(
       { uuid: userLogin.userUuid },
-      ACCESS_TOKEN_SECRET
+      ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: "30d"
+      }
     );
     return accessToken;
   }
